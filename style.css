@@ -103,3 +103,11 @@ input { width: 100%; background: #000; border: 1px solid #444; color: var(--neon
   .side-panel { flex-direction: row; height: auto; padding: 15px; }
   .knob { width: 60px; height: 60px; }
 }
+.osd {
+  color: var(--neon-green);
+  font-size: 1.3rem;
+  text-align: center;
+  text-transform: uppercase;
+  transition: opacity 0.3s ease;
+  min-height: 1.5rem;
+}
