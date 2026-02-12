@@ -1,6 +1,6 @@
-// === CONFIG – YOUR SHEET & FORM ===
-const SHEET_ID = '1CcZCwijJ0Gi-5QoFSU8HHkm6bkZyyluAb0Sych32dMs';
-const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeUhmbjy6ZckDE1MyetLete4WrVpHyZRkws9aj1heuSelGjog/viewform';
+// === CONFIG – YOUR NEW SHEET & FORM ===
+const SHEET_ID = '1mVgVFSpT4fb6HTf4-8fi_fxDXReZ69LUOI5vGdo0DPU';
+const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSebUTZIz5BC-l3I_iX9zguGN6XcoZ12ocZh6MvbWulyNCQ7ww/viewform';
 const PLAY_TIME = 25000;
 
 // === STATE ===
@@ -23,7 +23,7 @@ function showSubmit() { sfx(); submit.classList.add('active'); tv.classList.remo
 function toggleName() { sfx(); showName = !showName; meta.style.display = showName ? 'block' : 'none'; }
 function closeInfo() { sfx(); info.classList.remove('active'); }
 
-// === LOAD SHEET – CSV ENDPOINT, NO HOURS ===
+// === LOAD SHEET – CSV ENDPOINT ===
 const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=0`;
 
 fetch(SHEET_CSV_URL)
@@ -66,7 +66,7 @@ fetch(SHEET_CSV_URL)
     ];
   });
 
-// === PLAY VIDEO – SIMPLIFIED, NO HOURS ===
+// === PLAY VIDEO ===
 function playRandom() {
   if (!videos.length) {
     meta.innerText = '📼 No videos yet – submit one!';
@@ -86,7 +86,7 @@ function playRandom() {
   setTimeout(() => { player.src = ''; }, PLAY_TIME);
 }
 
-// === SUBMISSION – SIMPLIFIED, ONLY 2 FIELDS ===
+// === SUBMISSION – YOUR NEW ENTRY IDs ===
 const link = document.getElementById('s_link');
 const s_name = document.getElementById('s_name');
 const btnSend = document.getElementById('btnSend');
@@ -99,10 +99,10 @@ link.oninput = s_name.oninput = validate;
 btnSend.onclick = () => {
   sfx();
   
-  // Only send Video Link and Your Name to form
+  // Your new Entry IDs from prefilled link
   const params = new URLSearchParams({
-    'entry.374842444': link.value,   // Video Link
-    'entry.1202453826': s_name.value // Your Name
+    'entry.873128711': link.value,   // ✅ Video Link ID
+    'entry.3875702': s_name.value    // ✅ Your Name ID
   });
   
   window.open(FORM_URL + '?' + params.toString(), '_blank');
