@@ -16,12 +16,25 @@ const player = document.getElementById('player');
 const meta = document.getElementById('meta');
 const click = document.getElementById('sfxClick');
 const staticSfx = document.getElementById('sfxStatic');
+const info = document.getElementById('info');
+const h_start = document.getElementById('h_start');
+const h_end = document.getElementById('h_end');
+const btnSend = document.getElementById('btnSend');
+const s_link = document.getElementById('s_link');
+const s_title = document.getElementById('s_title');
+const s_name = document.getElementById('s_name');
+const s_email = document.getElementById('s_email');
+
+const btnSwitch = document.getElementById('btnSwitch');
+const btnSubmit = document.getElementById('btnSubmit');
+const btnInfo = document.getElementById('btnInfo');
+const btnShowName = document.getElementById('btnShowName');
 
 // === UI FUNCTIONS ===
 function sfx(){ click.currentTime=0; click.play(); }
 function showTV(){ sfx(); tv.classList.add('active'); submit.classList.remove('active'); }
 function showSubmit(){ sfx(); submit.classList.add('active'); tv.classList.remove('active'); }
-function toggleName(){ sfx(); showName = !showName; meta.style.display = showName ? 'block' : 'none'; }
+function toggleName(){ sfx(); showName = !showName; meta.style.visibility = showName ? 'visible' : 'hidden'; }
 function closeInfo(){ sfx(); info.classList.remove('active'); }
 
 // === HOURS ===
@@ -35,18 +48,22 @@ function hour(t,v){
 fetch(SHEET_URL)
   .then(r=>r.text())
   .then(t=>{
-    const json = JSON.parse(t.substring(47).slice(0,-2));
-    videos = json.table.rows
-      .map(r=>({
-        url:r.c[0]?.v,
-        title:r.c[1]?.v,
-        by:r.c[2]?.v||'Anonymous',
-        start:r.c[3]?.v ?? 0,
-        end:r.c[4]?.v ?? 23,
-        ok:r.c[5]?.v===true
-      }))
-      .filter(v=>v.ok);
-    playRandom();
+    try {
+        const json = JSON.parse(t.substring(47).slice(0,-2));
+        videos = json.table.rows
+          .map(r=>({
+            url:r.c[0]?.v,
+            title:r.c[1]?.v,
+            by:r.c[2]?.v||'Anonymous',
+            start:r.c[3]?.v ?? 0,
+            end:r.c[4]?.v ?? 23,
+            ok:r.c[5]?.v===true
+          }))
+          .filter(v=>v.ok);
+        playRandom();
+    } catch(e) {
+        meta.innerText = "SIGNAL LOST - CHECK CONFIG";
+    }
   });
 
 // === PLAY VIDEO ===
@@ -55,25 +72,32 @@ function playRandom(){
   const h = new Date().getHours();
   const pool = videos.filter(v=>h>=v.start && h<=v.end);
   const v = pool[Math.floor(Math.random()*pool.length)] || videos[0];
+  
+  staticSfx.currentTime = 0;
   staticSfx.play();
-  meta.innerText = `📼 ${v.title} — by ${v.by}`;
-  meta.style.display = showName ? 'block' : 'none';
+  
+  meta.innerText = `📼 ${v.title} — BY ${v.by}`;
+  meta.style.visibility = showName ? 'visible' : 'hidden';
+  
   player.style.opacity = 0;
-  player.src = v.url + '?autoplay=1&controls=0';
-  setTimeout(()=> player.style.opacity=1, 100);
+  // Ensure the URL is prepared for autoplay
+  let finalUrl = v.url;
+  finalUrl += v.url.includes('?') ? '&autoplay=1&controls=0' : '?autoplay=1&controls=0';
+  
+  player.src = finalUrl;
+  setTimeout(()=> player.style.opacity=1, 800);
   setTimeout(()=> player.src='', PLAY_TIME);
 }
 
 // === SUBMISSION ===
-const link = s_link, title = s_title;
-function validate(){ btnSend.disabled = !(link.value.includes('youtube') && title.value.length>2); }
-link.oninput = title.oninput = validate;
+function validate(){ btnSend.disabled = !(s_link.value.includes('http') && s_title.value.length>2); }
+s_link.oninput = s_title.oninput = validate;
 
 btnSend.onclick = ()=>{
   sfx();
   const params = new URLSearchParams({
-    'entry.111': link.value,
-    'entry.222': title.value,
+    'entry.111': s_link.value,
+    'entry.222': s_title.value,
     'entry.333': s_name.value,
     'entry.444': s_email.value,
     'entry.555': startH,
