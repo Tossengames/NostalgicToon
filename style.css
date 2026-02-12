@@ -60,6 +60,7 @@ button {
   border: 2px solid #0ff;
   padding: 10px 14px;
   cursor: pointer;
+  font-size: 16px;
 }
 button:hover {
   box-shadow: 0 0 10px #0ff;
@@ -69,6 +70,7 @@ button:disabled {
   cursor: not-allowed;
 }
 
+/* TV Buttons Positions */
 button#btnSwitch {
   position: absolute;
   left: 50%;
@@ -78,7 +80,7 @@ button#btnSwitch {
 
 button#btnShowName {
   position: absolute;
-  left: calc(50% - 60px);
+  left: calc(50% - 90px);
   bottom: 15px;
   width: 30px;
   height: 30px;
@@ -93,7 +95,7 @@ button#btnInfo {
 button#btnSubmit {
   position: absolute;
   top: 10px;
-  left: 70px;
+  left: 50px;
 }
 
 .meta {
