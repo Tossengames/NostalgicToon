@@ -1,7 +1,3 @@
-/* =========================
-   Nostalgia TV Full CSS
-========================= */
-
 * {
   box-sizing: border-box;
 }
@@ -22,7 +18,6 @@ body {
   align-items: center;
   flex-direction: column;
 }
-
 .view.active {
   display: flex;
 }
@@ -59,7 +54,6 @@ body {
   pointer-events: none;
 }
 
-/* Buttons styling */
 button {
   background: #000;
   color: #0ff;
@@ -67,17 +61,14 @@ button {
   padding: 10px 14px;
   cursor: pointer;
 }
-
 button:hover {
   box-shadow: 0 0 10px #0ff;
 }
-
 button:disabled {
   opacity: .4;
   cursor: not-allowed;
 }
 
-/* TV Buttons Positions */
 button#btnSwitch {
   position: absolute;
   left: 50%;
@@ -111,7 +102,6 @@ button#btnSubmit {
   text-align: center;
 }
 
-/* Cards and submission form */
 .card {
   background: #000;
   padding: 20px;
@@ -142,7 +132,6 @@ input {
   margin-top: 10px;
 }
 
-/* Overlay / info panel */
 .overlay {
   position: fixed;
   inset: 0;
@@ -151,7 +140,6 @@ input {
   justify-content: center;
   align-items: center;
 }
-
 .overlay.active {
   display: flex;
 }
