@@ -3,95 +3,109 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes" />
-  <title>Nostalgia TV · Retro Stream</title>
+  <title>Nostalgia TV · 90s Edition</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<!-- ========== TV VIEW ========== -->
+<!-- ========== CRT TV VIEW ========== -->
 <section id="tv" class="view active">
-  <!-- CRT SCREEN + FRAME -->
-  <div class="tv-cabinet">
-    <div class="tv-screen-border">
-      <div class="screen-reflection"></div>
-      <div class="screen">
-        <div class="noise"></div>
-        <div class="scanlines"></div>
-        <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+  
+  <!-- Vintage TV Cabinet -->
+  <div class="tv-set">
+    <div class="crt">
+      <div class="screen-curve">
+        <div class="screen">
+          <div class="static"></div>
+          <div class="scanline"></div>
+          <div class="phosphor"></div>
+          <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
       </div>
     </div>
-    <!-- decorative knobs / retro vibe -->
-    <div class="tv-knobs">
-      <span class="knob"></span>
-      <span class="knob"></span>
-      <span class="knob small"></span>
+    
+    <!-- Retro Control Panel -->
+    <div class="control-panel">
+      <div class="knob left">
+        <span class="indicator"></span>
+      </div>
+      <div class="channel-badge">
+        <span class="channel-number">📺</span>
+      </div>
+      <div class="knob right">
+        <span class="indicator"></span>
+      </div>
     </div>
   </div>
 
-  <!-- META INFO (fades in) -->
-  <div class="meta-wrapper" id="meta"></div>
+  <!-- Video Meta (VHS label) -->
+  <div class="vhs-label" id="meta"></div>
 
-  <!-- BUTTONS – repositioned for modern UX / mobile friendly -->
-  <div class="tv-controls">
-    <button id="btnInfo" class="ctrl info" aria-label="info">ℹ️</button>
-    <button id="btnSubmit" class="ctrl submit" aria-label="submit video">📤</button>
-    <button id="btnShowName" class="ctrl name-badge" aria-label="toggle name">!</button>
-    <button id="btnSwitch" class="ctrl shuffle" aria-label="next random">⬅️➡️</button>
+  <!-- TV REMOTE CONTROL (Buttons) -->
+  <div class="remote">
+    <button id="btnInfo" class="remote-btn info">ℹ️</button>
+    <button id="btnSubmit" class="remote-btn submit">📼</button>
+    <button id="btnShowName" class="remote-btn name">!</button>
+    <button id="btnSwitch" class="remote-btn switch">
+      <span class="arrow-icon">▶</span>
+    </button>
   </div>
+
 </section>
 
 <!-- ========== SUBMIT VIEW ========== -->
 <section id="submit" class="view">
-  <div class="card glass">
-    <h2>📼 submit nostalgia</h2>
-    <p class="subhead">share a memory · every VHS counts</p>
+  <div class="y2k-card">
+    <h2>📼 SUBMIT</h2>
+    <p class="sub-label">share your memory</p>
 
     <label>🔗 video link *</label>
     <input id="s_link" type="url" placeholder="https://youtube.com/watch?v=..." />
 
-    <label>🏷️ video title *</label>
-    <input id="s_title" type="text" placeholder="90s commercial, cartoon …" />
+    <label>🏷️ title *</label>
+    <input id="s_title" type="text" placeholder="90s commercial, cartoon..." />
 
     <label>👤 your name</label>
-    <input id="s_name" type="text" placeholder="anonymous VHS hero" />
+    <input id="s_name" type="text" placeholder="anonymous" />
 
     <label>📧 email</label>
-    <input id="s_email" type="email" placeholder="not shared (optional)" />
+    <input id="s_email" type="email" placeholder="optional" />
 
-    <div class="hour-pair">
-      <div class="hour-control">
-        <label>⏱️ start hour</label>
-        <div class="hour-buttons">
-          <button onclick="hour('start',-1)" class="minimal">−</button>
+    <div class="hour-row">
+      <div class="hour-block">
+        <label>⏱️ start</label>
+        <div class="hour-toggle">
+          <button onclick="hour('start',-1)" class="hour-btn">−</button>
           <span id="h_start">0</span>
-          <button onclick="hour('start',1)" class="minimal">+</button>
+          <button onclick="hour('start',1)" class="hour-btn">+</button>
         </div>
       </div>
-      <div class="hour-control">
-        <label>⏱️ end hour</label>
-        <div class="hour-buttons">
-          <button onclick="hour('end',-1)" class="minimal">−</button>
+      <div class="hour-block">
+        <label>⏱️ end</label>
+        <div class="hour-toggle">
+          <button onclick="hour('end',-1)" class="hour-btn">−</button>
           <span id="h_end">23</span>
-          <button onclick="hour('end',1)" class="minimal">+</button>
+          <button onclick="hour('end',1)" class="hour-btn">+</button>
         </div>
       </div>
     </div>
 
-    <button id="btnSend" class="submit-btn" disabled>📀 SUBMIT</button>
-    <button class="back-btn" onclick="showTV()">← return to tv</button>
+    <button id="btnSend" class="y2k-submit" disabled>📀 REC & SUBMIT</button>
+    <button class="y2k-back" onclick="showTV()">← back to tv</button>
   </div>
 </section>
 
 <!-- ========== INFO OVERLAY ========== -->
 <div id="info" class="overlay">
-  <div class="card glass overlay-card">
-    <h3>📺 nostalgia tv</h3>
-    <p>a community-powered time machine.</p>
+  <div class="y2k-card overlay-card">
+    <h3>📺 NOSTALGIA TV</h3>
+    <div class="stripe"></div>
+    <p>a community-powered time machine</p>
     <p>random memories · random hours</p>
-    <div class="divider"></div>
+    <div class="stripe"></div>
     <p>thanks to every contributor ❤️</p>
-    <p class="small">VHS static & click sounds included</p>
-    <button onclick="closeInfo()" class="close-overlay">⏻ close</button>
+    <p class="tiny">vhs static · crt glow · y2k vibes</p>
+    <button onclick="closeInfo()" class="y2k-close">⏻ close</button>
   </div>
 </div>
 
