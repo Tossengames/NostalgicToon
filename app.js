@@ -1,82 +1,85 @@
-let audioCtx, panner, humOsc;
+// --- Data Sheet (The "Channels") ---
+const videoSheet = [
+    { name: "Neon City", uploader: "Spy01", url: "video1.mp4" },
+    { name: "Cyber Sunset", uploader: "Agent_X", url: "video2.mp4" }
+];
+
 const video = document.getElementById('main-video');
+const canvas = document.getElementById('static-canvas');
+const ctx = canvas.getContext('2d');
+let audioCtx, panner, humOsc;
 
-// 1. Random Image or Bloom Logic
-const images = ['bg1.jpg', 'bg2.png', 'bg3.jpg']; // Add your filenames here
-const bgContainer = document.getElementById('bg-container');
-
-function setBackground() {
-    const randomImg = images[Math.floor(Math.random() * images.length)];
-    const img = new Image();
-    img.src = `images/${randomImg}`;
-    
-    img.onload = () => {
-        bgContainer.classList.remove('fallback-bg');
-        bgContainer.style.backgroundImage = `url(${img.src})`;
-        bgContainer.style.backgroundSize = 'cover';
-        bgContainer.style.filter = 'blur(10px) brightness(0.6)';
-    };
-    img.onerror = () => {
-        console.log("No images found, keeping animated bloom.");
-    };
+// --- Static Noise Effect ---
+function drawStatic() {
+    const idata = ctx.createImageData(canvas.width, canvas.height);
+    const buffer = new Uint32Array(idata.data.buffer);
+    for (let i = 0; i < buffer.length; i++) {
+        buffer[i] = Math.random() < 0.5 ? 0xff000000 : 0xffffffff;
+    }
+    ctx.putImageData(idata, 0, 0);
+    if (!video.src) requestAnimationFrame(drawStatic);
 }
+canvas.width = 200; canvas.height = 150;
+drawStatic();
 
-// 2. Audio Engine (8D Effect + Hum + Reverb)
+// --- Audio Engine (8D + Hum + Reverb) ---
 function initAudio() {
-    if (audioCtx) return; // Prevent multiple initializations
-
+    if (audioCtx) return;
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const source = audioCtx.createMediaElementSource(video);
-
-    // Reverb (Simple simulate using a low-pass and gain for "echo")
-    const reverb = audioCtx.createConvolver(); 
-    // Note: True reverb needs an impulse file, using simple gain for now
     
-    // 8D Panner
-    panner = audioCtx.createPanner();
-    panner.panningModel = 'HRTF';
-
-    // TV Hum (Low volume 50Hz)
+    // Hum
     humOsc = audioCtx.createOscillator();
     const humGain = audioCtx.createGain();
     humOsc.frequency.value = 50;
-    humGain.gain.value = 0.02; // Very quiet
+    humGain.gain.value = 0.03;
     humOsc.connect(humGain).connect(audioCtx.destination);
     humOsc.start();
 
-    // Route: Video -> Panner -> Destination
+    // 8D Panner
+    const source = audioCtx.createMediaElementSource(video);
+    panner = audioCtx.createPanner();
+    panner.panningModel = 'HRTF';
     source.connect(panner).connect(audioCtx.destination);
-
-    video.play();
+    
     update8D();
 }
 
-// Rotate sound in 3D space
-let angle = 0;
 function update8D() {
-    const x = Math.sin(angle) * 5;
-    const z = Math.cos(angle) * 5;
-    panner.positionX.value = x;
-    panner.positionZ.value = z;
-    angle += 0.015; 
-    requestAnimationFrame(update8D);
+    let angle = 0;
+    setInterval(() => {
+        panner.positionX.value = Math.sin(angle) * 5;
+        panner.positionZ.value = Math.cos(angle) * 5;
+        angle += 0.02;
+    }, 50);
 }
 
-// 3. UI Logic
+// --- Interaction Logic ---
+function switchChannel() {
+    initAudio();
+    const randomVid = videoSheet[Math.floor(Math.random() * videoSheet.length)];
+    
+    canvas.classList.add('hidden'); // Hide noise
+    video.src = randomVid.url;
+    video.play();
+
+    document.getElementById('display-name').innerText = randomVid.name;
+    document.getElementById('display-uploader').innerText = `By: ${randomVid.uploader}`;
+}
+
+function openSubmit() { document.getElementById('submit-panel').classList.remove('hidden'); }
+function closeSubmit() { document.getElementById('submit-panel').classList.add('hidden'); }
+
+function submitVideo() {
+    const newVid = {
+        name: document.getElementById('input-name').value,
+        uploader: document.getElementById('input-uploader').value,
+        url: document.getElementById('input-url').value
+    };
+    videoSheet.push(newVid);
+    alert("Channel Encrypted and Added!");
+    closeSubmit();
+}
+
 function toggleInfo() {
     document.getElementById('video-info').classList.toggle('hidden');
 }
-
-function loadVideo() {
-    const url = document.getElementById('input-url').value;
-    const name = document.getElementById('input-name').value;
-    const uploader = document.getElementById('input-uploader').value;
-
-    if(url) video.src = url;
-    document.getElementById('display-name').innerText = name || "Untitled";
-    document.getElementById('display-uploader').innerText = `Uploader: ${uploader || "Unknown"}`;
-    video.play();
-}
-
-// Initialize BG on load
-setBackground();
