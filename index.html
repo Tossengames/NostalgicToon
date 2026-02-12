@@ -5,70 +5,92 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Nostalgia TV</title>
   <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 </head>
 <body>
 
-<!-- TV VIEW -->
 <section id="tv" class="view active">
-  <div class="tv">
-    <div class="screen">
-      <div class="noise"></div>
-      <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+  <div class="tv-container">
+    <div class="tv-frame">
+      <div class="screen">
+        <div class="noise"></div>
+        <div class="scanlines"></div>
+        <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      </div>
+    </div>
+    
+    <div class="meta-container">
+        <div class="meta" id="meta">INITIALIZING...</div>
+    </div>
+
+    <div class="controls">
+      <button id="btnInfo" title="About">ℹ️</button>
+      <button id="btnShowName" title="Toggle Title">!</button>
+      <button id="btnSwitch" class="btn-main">CHANGE CHANNEL</button>
+      <button id="btnSubmit" title="Submit Content">📤</button>
     </div>
   </div>
-
-  <div class="meta" id="meta"></div>
-
-  <button id="btnShowName">!</button>
-  <button id="btnSwitch">⬅️➡️</button>
-  <button id="btnInfo">ℹ️</button>
-  <button id="btnSubmit">📤SUBMIT</button>
 </section>
 
-<!-- SUBMIT VIEW -->
 <section id="submit" class="view">
   <div class="card">
-    <h2>Submit Nostalgia</h2>
+    <h2>SUBMIT NOSTALGIA</h2>
 
-    <label>Video Link *</label>
-    <input id="s_link" placeholder="YouTube / Archive link" />
-
-    <label>Video Title *</label>
-    <input id="s_title" placeholder="90s TV Ad" />
-
-    <label>Your Name</label>
-    <input id="s_name" placeholder="Optional" />
-
-    <label>Email</label>
-    <input id="s_email" placeholder="Optional" />
-
-    <label>Start Hour (optional)</label>
-    <div class="hour">
-      <button onclick="hour('start',-1)">−</button>
-      <span id="h_start">0</span>
-      <button onclick="hour('start',1)">+</button>
+    <div class="input-group">
+        <label>Video Link *</label>
+        <input id="s_link" placeholder="YouTube / Archive link" />
     </div>
 
-    <label>End Hour (optional)</label>
-    <div class="hour">
-      <button onclick="hour('end',-1)">−</button>
-      <span id="h_end">23</span>
-      <button onclick="hour('end',1)">+</button>
+    <div class="input-group">
+        <label>Video Title *</label>
+        <input id="s_title" placeholder="90s TV Ad" />
     </div>
 
-    <button id="btnSend" disabled>SUBMIT</button>
-    <button class="back" onclick="showTV()">← BACK</button>
+    <div class="row">
+        <div class="input-group">
+            <label>Your Name</label>
+            <input id="s_name" placeholder="Optional" />
+        </div>
+        <div class="input-group">
+            <label>Email</label>
+            <input id="s_email" placeholder="Optional" />
+        </div>
+    </div>
+
+    <div class="hour-picker">
+        <div class="hour-col">
+            <label>Start Hour</label>
+            <div class="hour">
+              <button onclick="hour('start',-1)">−</button>
+              <span id="h_start">0</span>
+              <button onclick="hour('start',1)">+</button>
+            </div>
+        </div>
+        <div class="hour-col">
+            <label>End Hour</label>
+            <div class="hour">
+              <button onclick="hour('end',-1)">−</button>
+              <span id="h_end">23</span>
+              <button onclick="hour('end',1)">+</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <button id="btnSend" disabled>SUBMIT VIDEO</button>
+        <button class="back" onclick="showTV()">← BACK</button>
+    </div>
   </div>
 </section>
 
-<!-- INFO -->
 <div id="info" class="overlay">
-  <div class="card">
-    <h3>Nostalgia TV</h3>
-    <p>A community-powered nostalgia television.</p>
+  <div class="card info-card">
+    <h3>NOSTALGIA TV</h3>
+    <hr>
+    <p>A community-powered nostalgia television station.</p>
     <p>Random memories. Random times.</p>
-    <p>Thanks to everyone contributing ❤️</p>
-    <button onclick="closeInfo()">CLOSE</button>
+    <p>Broadcast powered by contributors like you.</p>
+    <button onclick="closeInfo()">CLOSE SIGNAL</button>
   </div>
 </div>
 
