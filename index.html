@@ -10,87 +10,86 @@
 <body>
 
 <section id="tv" class="view active">
-  <div class="tv-container">
-    <div class="tv-frame">
-      <div class="screen">
+  <div class="tv-unit">
+    <div class="tv-top"><span>NOSTALGIA-COLOR DELUXE</span></div>
+    
+    <div class="tv-body">
+      <div class="screen-area">
+        <div class="glass-reflection"></div>
         <div class="noise"></div>
         <div class="scanlines"></div>
         <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
       </div>
+
+      <div class="side-panel">
+        <div class="speaker-grill"></div>
+        
+        <div class="knob-container">
+          <button id="btnSwitch" class="knob" title="Switch Channel">
+            <div class="knob-indicator"></div>
+            <span class="icon">🔄</span>
+          </button>
+          <label>CHANNEL</label>
+        </div>
+
+        <div class="small-btns">
+            <button id="btnShowName" title="OSD Toggle">!</button>
+            <button id="btnInfo" title="Manual">ℹ️</button>
+            <button id="btnSubmit" title="Feed">📤</button>
+        </div>
+      </div>
     </div>
     
-    <div class="meta-container">
-        <div class="meta" id="meta">INITIALIZING...</div>
-    </div>
-
-    <div class="controls">
-      <button id="btnInfo" title="About">ℹ️</button>
-      <button id="btnShowName" title="Toggle Title">!</button>
-      <button id="btnSwitch" class="btn-main">CHANGE CHANNEL</button>
-      <button id="btnSubmit" title="Submit Content">📤</button>
+    <div class="meta-display">
+        <div class="osd" id="meta">VCR - PLAY</div>
     </div>
   </div>
 </section>
 
 <section id="submit" class="view">
-  <div class="card">
-    <h2>SUBMIT NOSTALGIA</h2>
-
+  <div class="retro-card">
+    <h2>TRANSMISSION FEED</h2>
     <div class="input-group">
-        <label>Video Link *</label>
-        <input id="s_link" placeholder="YouTube / Archive link" />
+        <label>VIDEO LINK</label>
+        <input id="s_link" placeholder="YouTube/Archive URL" />
     </div>
-
     <div class="input-group">
-        <label>Video Title *</label>
-        <input id="s_title" placeholder="90s TV Ad" />
+        <label>PROGRAM TITLE</label>
+        <input id="s_title" placeholder="90s Cereal Ad..." />
     </div>
-
     <div class="row">
-        <div class="input-group">
-            <label>Your Name</label>
-            <input id="s_name" placeholder="Optional" />
-        </div>
-        <div class="input-group">
-            <label>Email</label>
-            <input id="s_email" placeholder="Optional" />
-        </div>
+        <div class="input-group"><label>SENDER</label><input id="s_name" /></div>
+        <div class="input-group"><label>CONTACT</label><input id="s_email" /></div>
     </div>
-
-    <div class="hour-picker">
-        <div class="hour-col">
-            <label>Start Hour</label>
-            <div class="hour">
-              <button onclick="hour('start',-1)">−</button>
-              <span id="h_start">0</span>
-              <button onclick="hour('start',1)">+</button>
+    <div class="hour-wrap">
+        <div class="h-box">
+            <label>START</label>
+            <div class="h-ctrl">
+                <button onclick="hour('start',-1)">-</button>
+                <span id="h_start">0</span>
+                <button onclick="hour('start',1)">+</button>
             </div>
         </div>
-        <div class="hour-col">
-            <label>End Hour</label>
-            <div class="hour">
-              <button onclick="hour('end',-1)">−</button>
-              <span id="h_end">23</span>
-              <button onclick="hour('end',1)">+</button>
+        <div class="h-box">
+            <label>END</label>
+            <div class="h-ctrl">
+                <button onclick="hour('end',-1)">-</button>
+                <span id="h_end">23</span>
+                <button onclick="hour('end',1)">+</button>
             </div>
         </div>
     </div>
-
-    <div class="form-actions">
-        <button id="btnSend" disabled>SUBMIT VIDEO</button>
-        <button class="back" onclick="showTV()">← BACK</button>
-    </div>
+    <button id="btnSend" disabled>UPLOAD SIGNAL</button>
+    <button class="back-link" onclick="showTV()">RETURN TO BROADCAST</button>
   </div>
 </section>
 
 <div id="info" class="overlay">
-  <div class="card info-card">
-    <h3>NOSTALGIA TV</h3>
-    <hr>
-    <p>A community-powered nostalgia television station.</p>
-    <p>Random memories. Random times.</p>
-    <p>Broadcast powered by contributors like you.</p>
-    <button onclick="closeInfo()">CLOSE SIGNAL</button>
+  <div class="retro-card info-box">
+    <h3>STATION INFO</h3>
+    <p>Broadcasting random analog memories 24/7.</p>
+    <p>Curated by the community.</p>
+    <button onclick="closeInfo()">EXIT MENU</button>
   </div>
 </div>
 
