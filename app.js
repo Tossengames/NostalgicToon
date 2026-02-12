@@ -1,136 +1,94 @@
-// ======================
-// CONFIG
-// ======================
-const SHEET_URL =
-  "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/pub?output=csv";
+// === CONFIG ===
+const SHEET_ID = 'PASTE_YOUR_SHEET_ID_HERE';
+const FORM_URL = 'PASTE_YOUR_GOOGLE_FORM_URL_HERE';
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+const PLAY_TIME = 25000; // 25 seconds
+const FADE_TIME = 1000; // 1s fade
 
-const MAX_PLAY_TIME = 25; // seconds
-
+// === STATE ===
 let videos = [];
-let forceTimer = null;
-let showInfo = true;
+let startH = 0, endH = 23;
 
-// ======================
-// ELEMENTS
-// ======================
-const videoEl = document.getElementById("video");
-const titleEl = document.getElementById("title");
-const infoEl = document.getElementById("info");
-const clockEl = document.getElementById("clock");
+// === ELEMENTS ===
+const tv = document.getElementById('tv');
+const submit = document.getElementById('submit');
+const player = document.getElementById('player');
+const meta = document.getElementById('meta');
+const click = document.getElementById('sfxClick');
+const staticSfx = document.getElementById('sfxStatic');
 
-// ======================
-// AUDIO (OLD TECH STYLE)
-// ======================
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+// === UI ===
+function sfx(){ click.currentTime=0; click.play(); }
+function showTV(){ sfx(); tv.classList.add('active'); submit.classList.remove('active'); }
+function showSubmit(){ sfx(); submit.classList.add('active'); tv.classList.remove('active'); }
 
-function beep(freq = 900, dur = 0.05) {
-  const o = audioCtx.createOscillator();
-  const g = audioCtx.createGain();
-  o.type = "square";
-  o.frequency.value = freq;
-  g.gain.value = 0.05;
-  o.connect(g).connect(audioCtx.destination);
-  o.start();
-  o.stop(audioCtx.currentTime + dur);
+// === HOURS ===
+function hour(t,v){
+  sfx();
+  if(t==='start'){ startH=(startH+v+24)%24; h_start.innerText=startH; }
+  else{ endH=(endH+v+24)%24; h_end.innerText=endH; }
 }
 
-function staticNoise(dur = 0.25) {
-  const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * dur, audioCtx.sampleRate);
-  const data = buf.getChannelData(0);
-  for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
-  const src = audioCtx.createBufferSource();
-  src.buffer = buf;
-  src.connect(audioCtx.destination);
-  src.start();
-}
-
-// ======================
-// CLOCK
-// ======================
-setInterval(() => {
-  clockEl.textContent = new Date().toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit"
-  });
-}, 1000);
-
-// ======================
-// LOAD SHEET DATA
-// ======================
-async function loadVideos() {
-  const res = await fetch(SHEET_URL);
-  const text = await res.text();
-
-  videos = text
-    .trim()
-    .split("\n")
-    .slice(1)
-    .map(row => {
-      const [approved, title, author, url, hour] =
-        row.split(",").map(v => v.replace(/^"|"$/g, "").trim());
-
-      return {
-        approved: approved === "yes",
-        title,
-        author,
-        url,
-        hour: hour === "" ? null : Number(hour)
-      };
-    })
-    .filter(v => v.approved && v.url);
-}
-
-// ======================
-// VIDEO LOGIC
-// ======================
-function validVideos() {
-  const h = new Date().getHours();
-  return videos.filter(v => v.hour === null || v.hour === h);
-}
-
-function playRandom() {
-  if (!videos.length) return;
-
-  const pool = validVideos();
-  if (!pool.length) return;
-
-  const v = pool[Math.floor(Math.random() * pool.length)];
-  titleEl.textContent = `▸ ${v.title} – by ${v.author}`;
-
-  videoEl.src = v.url;
-  videoEl.play();
-
-  if (forceTimer) clearTimeout(forceTimer);
-  forceTimer = setTimeout(() => {
-    staticNoise();
+// === LOAD SHEET ===
+fetch(SHEET_URL)
+  .then(r=>r.text())
+  .then(t=>{
+    const json = JSON.parse(t.substring(47).slice(0,-2));
+    videos = json.table.rows
+      .map(r=>({
+        url:r.c[0]?.v,
+        title:r.c[1]?.v,
+        by:r.c[2]?.v||'Anonymous',
+        start:r.c[3]?.v ?? 0,
+        end:r.c[4]?.v ?? 23,
+        ok:r.c[5]?.v===true
+      }))
+      .filter(v=>v.ok);
     playRandom();
-  }, MAX_PLAY_TIME * 1000);
+  });
+
+// === PLAY WITH FADE ===
+function playRandom(){
+  if(!videos.length) return;
+  const h = new Date().getHours();
+  const pool = videos.filter(v=>h>=v.start && h<=v.end);
+  const v = pool[Math.floor(Math.random()*pool.length)] || videos[0];
+  staticSfx.play();
+  meta.innerText = `📼 ${v.title} — by ${v.by}`;
+
+  // Fade in
+  player.style.opacity = 0;
+  player.src = v.url + '?autoplay=1&controls=0';
+  setTimeout(()=>player.style.opacity=1,50);
+
+  // Schedule fade out
+  setTimeout(()=>{
+    player.style.opacity = 0;
+    setTimeout(()=>player.src='', FADE_TIME);
+  }, PLAY_TIME - FADE_TIME);
 }
 
-videoEl.onended = () => {
-  if (forceTimer) clearTimeout(forceTimer);
-  staticNoise(0.2);
-  playRandom();
+// === SUBMIT ===
+const link = s_link, title = s_title;
+function validate(){ btnSend.disabled = !(link.value.includes('youtube') && title.value.length>2); }
+link.oninput = title.oninput = validate;
+
+btnSend.onclick = ()=>{
+  sfx();
+  const params = new URLSearchParams({
+    'entry.111': link.value,
+    'entry.222': title.value,
+    'entry.333': s_name.value,
+    'entry.444': s_email.value,
+    'entry.555': startH,
+    'entry.666': endH
+  });
+  window.open(FORM_URL + '?' + params.toString(),'_blank');
+  showTV();
 };
 
-// ======================
-// CONTROLS
-// ======================
-document.getElementById("switch").onclick = () => {
-  audioCtx.resume();
-  beep(700);
-  staticNoise();
-  playRandom();
-};
-
-document.getElementById("toggleInfo").onclick = () => {
-  audioCtx.resume();
-  beep(1200, 0.04);
-  showInfo = !showInfo;
-  infoEl.style.opacity = showInfo ? 1 : 0;
-};
-
-// ======================
-// START
-// ======================
-loadVideos().then(playRandom);
+// === BUTTONS ===
+btnSwitch.onclick = ()=>{ sfx(); playRandom(); }
+btnSubmit.onclick = showSubmit;
+btnInfo.onclick = ()=>{ sfx(); info.classList.add('active'); }
+function closeInfo(){ sfx(); info.classList.remove('active'); }
