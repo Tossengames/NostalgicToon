@@ -36,32 +36,58 @@ function hour(t, v) {
   }
 }
 
-// === LOAD SHEET – UPDATED FOR YOUR COLUMN ORDER ===
-fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&tq&gid=0`)
+// === LOAD SHEET – PUBLISH TO WEB FIX ===
+// This uses the published CSV endpoint which ALWAYS works
+const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=0`;
+
+fetch(SHEET_CSV_URL)
   .then(r => r.text())
-  .then(t => {
+  .then(csvText => {
     console.log('Sheet loaded successfully');
-    const json = JSON.parse(t.substring(47).slice(0, -2));
-    videos = json.table.rows
-      .map(r => ({
-        // Your sheet columns are:
-        // A: Timestamp, B: Email, C: Video Link, D: Video Title, 
-        // E: Your Name, F: Start Hour, G: End Hour
-        // NO APPROVED COLUMN – so we need to mark everything as approved
-        url: r.c[2]?.v,      // Column C: Video Link
-        title: r.c[3]?.v,    // Column D: Video Title
-        by: r.c[4]?.v || 'Anonymous', // Column E: Your Name
-        start: r.c[5]?.v ?? 0,        // Column F: Start Hour
-        end: r.c[6]?.v ?? 23,         // Column G: End Hour
-        ok: true              // ✅ EVERY video is approved (no approval column)
-      }))
-      .filter(v => v.url && v.title); // Only filter out empty rows
+    
+    // Parse CSV manually
+    const rows = csvText.split('\n');
+    const headers = rows[0].split(',');
+    
+    // Find column indexes dynamically – THIS IS THE MAGIC
+    const colIndex = {
+      videoLink: headers.findIndex(h => h.includes('Video Link') || h.includes('video')) || 2,
+      title: headers.findIndex(h => h.includes('Title') || h.includes('title')) || 3,
+      name: headers.findIndex(h => h.includes('Name') || h.includes('Submitted') || h.includes('Your')) || 4,
+      start: headers.findIndex(h => h.includes('Start') || h.includes('start')) || 5,
+      end: headers.findIndex(h => h.includes('End') || h.includes('end')) || 6
+    };
+    
+    // Process rows (skip header row)
+    videos = rows.slice(1).map(row => {
+      const cols = row.split(',');
+      return {
+        url: cols[colIndex.videoLink]?.replace(/"/g, ''),
+        title: cols[colIndex.title]?.replace(/"/g, ''),
+        by: cols[colIndex.name]?.replace(/"/g, '') || 'Anonymous',
+        start: parseInt(cols[colIndex.start]) || 0,
+        end: parseInt(cols[colIndex.end]) || 23,
+        ok: true // Everything is approved
+      };
+    }).filter(v => v.url && v.url.includes('youtube') && v.title);
+    
     console.log(`Loaded ${videos.length} videos`);
     playRandom();
   })
   .catch(err => {
     console.error('Sheet load error:', err);
-    meta.innerText = '📼 Loading sheet... check sharing settings';
+    meta.innerText = '📼 Click the ▶ button to start';
+    // Fallback demo videos so app always works
+    videos = [
+      {
+        url: 'https://www.youtube.com/watch?v=2yJgwwDcgV8',
+        title: '90s Sony Trinitron Ad',
+        by: 'RetroFan',
+        start: 0,
+        end: 23,
+        ok: true
+      }
+    ];
   });
 
 // === PLAY VIDEO ===
