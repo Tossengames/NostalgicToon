@@ -1,7 +1,7 @@
 // === CONFIG ===
-const SHEET_ID = '1l3NChHHcKJzYW9dK8mbb60ASmf7vrd9yxXn2tNfSaz0'; // ✅ Your sheet ID
-const FORM_URL = 'PASTE_YOUR_GOOGLE_FORM_URL_HERE'; // ⚠️ REPLACE THIS
-const PLAY_TIME = 25000; // 25 seconds
+const SHEET_ID = '1CcZCwijJ0Gi-5QoFSU8HHkm6bkZyyluAb0Sych32dMs';
+const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeUhmbjy6ZckDE1MyetLete4WrVpHyZRkws9aj1heuSelGjog/viewform';
+const PLAY_TIME = 25000;
 
 // === STATE ===
 let videos = [];
@@ -27,23 +27,28 @@ function closeInfo() { sfx(); info.classList.remove('active'); }
 // === HOURS ===
 function hour(t, v) {
   sfx();
-  if (t === 'start') { startH = (startH + v + 24) % 24; document.getElementById('h_start').innerText = startH; }
-  else { endH = (endH + v + 24) % 24; document.getElementById('h_end').innerText = endH; }
+  if (t === 'start') { 
+    startH = (startH + v + 24) % 24; 
+    document.getElementById('h_start').innerText = startH; 
+  } else { 
+    endH = (endH + v + 24) % 24; 
+    document.getElementById('h_end').innerText = endH; 
+  }
 }
 
-// === LOAD SHEET – UPDATED FOR 7 COLUMNS (Timestamp at index 0) ===
+// === LOAD SHEET ===
 fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`)
   .then(r => r.text())
   .then(t => {
     const json = JSON.parse(t.substring(47).slice(0, -2));
     videos = json.table.rows
       .map(r => ({
-        url: r.c[1]?.v,      // ✅ Column B (Video Link)
-        title: r.c[2]?.v,    // ✅ Column C (Title)
-        by: r.c[3]?.v || 'Anonymous', // ✅ Column D (Submitted By)
-        start: r.c[4]?.v ?? 0,        // ✅ Column E (Start Hour)
-        end: r.c[5]?.v ?? 23,         // ✅ Column F (End Hour)
-        ok: r.c[6]?.v === true        // ✅ Column G (Approved)
+        url: r.c[1]?.v,      // Column B
+        title: r.c[2]?.v,    // Column C
+        by: r.c[3]?.v || 'Anonymous', // Column D
+        start: r.c[4]?.v ?? 0,        // Column E
+        end: r.c[5]?.v ?? 23,         // Column F
+        ok: r.c[6]?.v === true        // Column G
       }))
       .filter(v => v.ok);
     playRandom();
@@ -64,25 +69,27 @@ function playRandom() {
   setTimeout(() => player.src = '', PLAY_TIME);
 }
 
-// === SUBMISSION (Update with YOUR entry IDs) ===
+// === SUBMISSION ===
 const link = document.getElementById('s_link');
 const title = document.getElementById('s_title');
 const s_name = document.getElementById('s_name');
 const s_email = document.getElementById('s_email');
 const btnSend = document.getElementById('btnSend');
 
-function validate() { btnSend.disabled = !(link.value.includes('youtube') && title.value.length > 2); }
+function validate() { 
+  btnSend.disabled = !(link.value.includes('youtube') && title.value.length > 2); 
+}
 link.oninput = title.oninput = validate;
 
 btnSend.onclick = () => {
   sfx();
   const params = new URLSearchParams({
-    'entry.3333333333': link.value,   // ⚠️ REPLACE with your Video Link entry ID
-    'entry.1234567890': title.value,  // ⚠️ REPLACE with your Title entry ID
-    'entry.9876543210': s_name.value, // ⚠️ REPLACE with your Name entry ID
-    'entry.5555555555': s_email.value,// ⚠️ REPLACE with your Email entry ID
-    'entry.1111111111': startH,       // ⚠️ REPLACE with your Start Hour entry ID
-    'entry.2222222222': endH          // ⚠️ REPLACE with your End Hour entry ID
+    'entry.374842444': link.value,   // Video Link
+    'entry.1792715707': title.value, // Title
+    'entry.1202453826': s_name.value, // Name
+    'entry.1066956225': s_email.value, // Email
+    'entry.1319389294': startH,       // Start Hour
+    'entry.117336059': endH           // End Hour
   });
   window.open(FORM_URL + '?' + params.toString(), '_blank');
   showTV();
@@ -94,7 +101,7 @@ document.getElementById('btnSubmit').onclick = showSubmit;
 document.getElementById('btnInfo').onclick = () => { sfx(); info.classList.add('active'); };
 document.getElementById('btnShowName').onclick = toggleName;
 
-// Expose globals
+// === GLOBALS ===
 window.hour = hour;
 window.showTV = showTV;
 window.closeInfo = closeInfo;
