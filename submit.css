@@ -1,0 +1,25 @@
+body {
+  background: #050510;
+  color: #7ff;
+  font-family: monospace;
+  padding: 20px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 320px;
+}
+
+input, button {
+  background: #111;
+  color: #0ff;
+  border: 1px solid #0ff;
+  padding: 8px;
+}
+
+button {
+  cursor: pointer;
+  box-shadow: 0 0 12px #0ff;
+}
