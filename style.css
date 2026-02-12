@@ -30,7 +30,7 @@ body {
   display: flex;
 }
 
-/* ===== TV FRAME – Clean Minimal ===== */
+/* ===== TV FRAME ===== */
 .tv-frame {
   width: 100%;
   max-width: 720px;
@@ -136,7 +136,7 @@ body {
   padding-left: 4px;
 }
 
-/* ===== FORM CARD ===== */
+/* ===== FORM CARD – UPDATED FIELD ORDER ===== */
 .form-card {
   background: #151e2a;
   border-radius: 32px;
