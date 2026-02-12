@@ -17,6 +17,12 @@ const meta = document.getElementById('meta');
 const click = document.getElementById('sfxClick');
 const staticSfx = document.getElementById('sfxStatic');
 
+// === BACKGROUND IMAGE ===
+const img = new Image();
+img.src = 'images/bg.jpg';
+img.onload = ()=>document.body.style.backgroundImage = `url('${img.src}')`;
+// fallback: default background stays if image not found
+
 // === UI ===
 function sfx(){ click.currentTime=0; click.play(); }
 function showTV(){ sfx(); tv.classList.add('active'); submit.classList.remove('active'); }
