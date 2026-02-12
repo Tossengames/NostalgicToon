@@ -1,33 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Nostalgia TV</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<div id="clock"></div>
+<!-- TV VIEW -->
+<section id="tv" class="view active">
+  <div class="tv">
+    <div class="screen">
+      <div class="noise"></div>
+      <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+  </div>
 
-<div id="tv">
-  <div id="screen">
-    <video id="video" playsinline crossorigin="anonymous"></video>
-    <div id="noise"></div>
-    <div id="flicker"></div>
+  <div class="meta" id="meta"></div>
+
+  <div class="controls">
+    <button id="btnSwitch">CHANNEL</button>
+    <button id="btnSubmit">SUBMIT</button>
+    <button id="btnInfo">INFO</button>
+  </div>
+</section>
+
+<!-- SUBMIT VIEW -->
+<section id="submit" class="view">
+  <div class="card">
+    <h2>Submit Nostalgia</h2>
+
+    <label>Video Link *</label>
+    <input id="s_link" placeholder="YouTube / Archive link" />
+
+    <label>Video Title *</label>
+    <input id="s_title" placeholder="90s TV Ad" />
+
+    <label>Your Name</label>
+    <input id="s_name" placeholder="Optional" />
+
+    <label>Email</label>
+    <input id="s_email" placeholder="Optional" />
+
+    <label>Start Hour (optional)</label>
+    <div class="hour">
+      <button onclick="hour('start',-1)">−</button>
+      <span id="h_start">0</span>
+      <button onclick="hour('start',1)">+</button>
+    </div>
+
+    <label>End Hour (optional)</label>
+    <div class="hour">
+      <button onclick="hour('end',-1)">−</button>
+      <span id="h_end">23</span>
+      <button onclick="hour('end',1)">+</button>
+    </div>
+
+    <button id="btnSend" disabled>SUBMIT</button>
+    <button class="back" onclick="showTV()">← BACK</button>
+  </div>
+</section>
+
+<!-- INFO -->
+<div id="info" class="overlay">
+  <div class="card">
+    <h3>Nostalgia TV</h3>
+    <p>A community-powered nostalgia television.</p>
+    <p>Random memories. Random times.</p>
+    <p>Thanks to everyone contributing ❤️</p>
+    <button onclick="closeInfo()">CLOSE</button>
   </div>
 </div>
 
-<div id="info">
-  <span id="title"></span>
-</div>
-
-<div id="controls">
-  <button id="switch">CHANNEL ▶</button>
-  <button id="toggleInfo">INFO</button>
-</div>
-
-<a class="submit-link" href="submit.html">📼 Submit a clip</a>
+<audio id="sfxClick" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_4b77a0a9d5.mp3"></audio>
+<audio id="sfxStatic" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_5c68b1c0b0.mp3"></audio>
 
 <script src="app.js"></script>
 </body>
