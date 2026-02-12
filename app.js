@@ -3,11 +3,11 @@ const SHEET_ID = 'PASTE_YOUR_SHEET_ID_HERE';
 const FORM_URL = 'PASTE_YOUR_GOOGLE_FORM_URL_HERE';
 const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 const PLAY_TIME = 25000; // 25 seconds
-const FADE_TIME = 1000; // 1s fade
 
 // === STATE ===
 let videos = [];
 let startH = 0, endH = 23;
+let showName = true;
 
 // === ELEMENTS ===
 const tv = document.getElementById('tv');
@@ -17,16 +17,12 @@ const meta = document.getElementById('meta');
 const click = document.getElementById('sfxClick');
 const staticSfx = document.getElementById('sfxStatic');
 
-// === BACKGROUND IMAGE ===
-const img = new Image();
-img.src = 'images/bg.jpg';
-img.onload = ()=>document.body.style.backgroundImage = `url('${img.src}')`;
-// fallback: default background stays if image not found
-
-// === UI ===
+// === UI FUNCTIONS ===
 function sfx(){ click.currentTime=0; click.play(); }
 function showTV(){ sfx(); tv.classList.add('active'); submit.classList.remove('active'); }
 function showSubmit(){ sfx(); submit.classList.add('active'); tv.classList.remove('active'); }
+function toggleName(){ sfx(); showName = !showName; meta.style.display = showName ? 'block' : 'none'; }
+function closeInfo(){ sfx(); info.classList.remove('active'); }
 
 // === HOURS ===
 function hour(t,v){
@@ -53,7 +49,7 @@ fetch(SHEET_URL)
     playRandom();
   });
 
-// === PLAY WITH FADE ===
+// === PLAY VIDEO ===
 function playRandom(){
   if(!videos.length) return;
   const h = new Date().getHours();
@@ -61,20 +57,14 @@ function playRandom(){
   const v = pool[Math.floor(Math.random()*pool.length)] || videos[0];
   staticSfx.play();
   meta.innerText = `📼 ${v.title} — by ${v.by}`;
-
-  // Fade in
+  meta.style.display = showName ? 'block' : 'none';
   player.style.opacity = 0;
   player.src = v.url + '?autoplay=1&controls=0';
-  setTimeout(()=>player.style.opacity=1,50);
-
-  // Schedule fade out
-  setTimeout(()=>{
-    player.style.opacity = 0;
-    setTimeout(()=>player.src='', FADE_TIME);
-  }, PLAY_TIME - FADE_TIME);
+  setTimeout(()=> player.style.opacity=1, 100);
+  setTimeout(()=> player.src='', PLAY_TIME);
 }
 
-// === SUBMIT ===
+// === SUBMISSION ===
 const link = s_link, title = s_title;
 function validate(){ btnSend.disabled = !(link.value.includes('youtube') && title.value.length>2); }
 link.oninput = title.oninput = validate;
@@ -93,8 +83,8 @@ btnSend.onclick = ()=>{
   showTV();
 };
 
-// === BUTTONS ===
-btnSwitch.onclick = ()=>{ sfx(); playRandom(); }
+// === BUTTON EVENTS ===
+btnSwitch.onclick = ()=>{ sfx(); playRandom(); };
 btnSubmit.onclick = showSubmit;
-btnInfo.onclick = ()=>{ sfx(); info.classList.add('active'); }
-function closeInfo(){ sfx(); info.classList.remove('active'); }
+btnInfo.onclick = ()=>{ sfx(); info.classList.add('active'); };
+btnShowName.onclick = toggleName;
