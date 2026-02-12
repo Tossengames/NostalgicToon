@@ -1,13 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Nostalgia TV</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-</head>
-<body>
+<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+<form id="submissionForm" target="hidden_iframe" method="POST" action="https://docs.google.com/forms/d/e/1FAIpQLSebUTZIz5BC-l3I_iX9zguGN6XcoZ12ocZh6MvbWulyNCQ7ww/formResponse">
+    <input type="hidden" name="entry.873128711" id="f_link">
+    <input type="hidden" name="entry.3875702" id="f_name">
+</form>
 
 <section id="tv" class="view active">
   <div class="tv-unit">
@@ -19,22 +14,17 @@
       </div>
       
       <div class="side-panel">
-        <div class="knob-container">
-            <button id="btnSwitch" class="knob">
-                <div class="knob-indicator"></div>
-                🔄
-            </button>
-        </div>
+        <button id="btnSwitch" class="knob"><div class="knob-indicator"></div>🔄</button>
         <div class="small-btns">
-            <button id="btnShowName" title="OSD Toggle">!</button>
-            <button id="btnInfo" title="About">ℹ️</button>
-            <button id="btnSubmit" title="Contribute">📤</button>
+            <button id="btnShowName">!</button>
+            <button id="btnInfo">ℹ️</button>
+            <button id="btnSubmit">📤</button>
         </div>
       </div>
     </div>
     
     <div class="meta-display">
-        <div class="osd" id="meta">INITIALIZING...</div>
+        <div class="osd" id="meta">SYSTEM BOOT...</div>
     </div>
   </div>
 </section>
@@ -48,19 +38,3 @@
     <button class="back-link" onclick="showTV()">[ RETURN TO FEED ]</button>
   </div>
 </section>
-
-<div id="info" class="overlay">
-  <div class="retro-card">
-    <div class="terminal-header">STATION INFO</div>
-    <p>Broadcasting random analog memories.</p>
-    <p>Data Source: Google Sheets</p>
-    <button class="glitch-btn" onclick="closeInfo()">EXIT MENU</button>
-  </div>
-</div>
-
-<audio id="sfxClick" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_4b77a0a9d5.mp3"></audio>
-<audio id="sfxStatic" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_5c68b1c0b0.mp3"></audio>
-
-<script src="app.js"></script>
-</body>
-</html>
