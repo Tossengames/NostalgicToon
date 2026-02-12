@@ -1,76 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Nostalgia TV</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>Retro Spy TV Player</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="bg-container" class="fallback-bg"></div>
 
-<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
-<form id="submissionForm" 
-      target="hidden_iframe" 
-      method="POST" 
-      action="https://docs.google.com/forms/d/e/1FAIpQLSebUTZIz5BC-l3I_iX9zguGN6XcoZ12ocZh6MvbWulyNCQ7ww/formResponse">
-    <input type="hidden" name="entry.873128711" id="f_link">
-    <input type="hidden" name="entry.3875702" id="f_name">
-</form>
+    <div class="main-container">
+        <h1 id="top-title">SPY-VISION OS</h1>
 
-<section id="tv" class="view active">
-  <div class="tv-unit">
-    <div class="tv-top"><span>NOSTALGIA-COLOR DELUXE</span></div>
-    <div class="tv-body">
-      <div class="screen-area">
-        <div class="glass-reflection"></div>
-        <div class="noise"></div>
-        <div class="scanlines"></div>
-        <iframe id="player" allow="autoplay; encrypted-media"></iframe>
-      </div>
-      <div class="side-panel">
-        <div class="knob-container">
-            <button id="btnSwitch" class="knob"><div class="knob-indicator"></div>🔄</button>
-            <label>CHANNEL</label>
+        <div class="tv-frame">
+            <div class="side-lights left">
+                <div class="light pink"></div>
+                <div class="light cyan"></div>
+            </div>
+            
+            <div class="tv-screen">
+                <video id="main-video" src="your-video.mp4" loop></video>
+                <div class="screen-glow"></div>
+            </div>
+
+            <div class="side-lights right">
+                <div class="light cyan"></div>
+                <div class="light pink"></div>
+            </div>
         </div>
-        <div class="small-btns">
-            <button id="btnShowName">!</button>
-            <button id="btnInfo">ℹ️</button>
-            <button id="btnSubmit">📤</button>
+
+        <div id="video-info" class="info-panel hidden">
+            <h2 id="display-name">Video Title</h2>
+            <p id="display-uploader">Uploader: Unknown</p>
         </div>
-      </div>
+
+        <div class="controls">
+            <button onclick="toggleInfo()">INFO</button>
+            <button onclick="initAudio()">POWER ON / 8D START</button>
+        </div>
+
+        <hr>
+
+        <div class="submit-area">
+            <input type="text" id="input-url" placeholder="Video URL">
+            <input type="text" id="input-name" placeholder="Video Name">
+            <input type="text" id="input-uploader" placeholder="Uploader Name">
+            <button onclick="loadVideo()">SUBMIT</button>
+        </div>
     </div>
-    <div class="meta-display"><div class="osd" id="meta">VCR - PLAY</div></div>
-  </div>
-</section>
 
-<section id="submit" class="view">
-  <div class="retro-card">
-    <div class="terminal-header">TRANSMIT SIGNAL</div>
-    <div class="field">
-        <label>YOUTUBE URL</label>
-        <input id="s_link" type="text" placeholder="PASTE LINK...">
-    </div>
-    <div class="field">
-        <label>SENDER NAME</label>
-        <input id="s_name" type="text" placeholder="YOUR HANDLE...">
-    </div>
-    <button id="btnSend" class="glitch-btn">BROADCAST NOW</button>
-    <button class="back-link" onclick="showTV()">[ CANCEL ]</button>
-  </div>
-</section>
-
-<div id="info" class="overlay">
-  <div class="retro-card">
-    <div class="terminal-header">STATION INFO</div>
-    <p>Broadcasting community memories.</p>
-    <button class="glitch-btn" onclick="closeInfo()">EXIT</button>
-  </div>
-</div>
-
-<audio id="sfxClick" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_4b77a0a9d5.mp3"></audio>
-<audio id="sfxStatic" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_5c68b1c0b0.mp3"></audio>
-
-<script src="app.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
