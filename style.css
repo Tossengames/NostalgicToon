@@ -1,69 +1,75 @@
 :root {
-    --spy-pink: #ff00ff;
-    --spy-cyan: #00ffff;
-    --spy-purple: #7a28ff;
+    --pink: #ff00ff;
+    --cyan: #00ffff;
+    --purple: #6a0dad;
 }
 
 body {
-    margin: 0;
-    overflow: hidden;
-    font-family: 'Courier New', Courier, monospace;
+    background: #000;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    color: white;
+    min-height: 100vh;
+    margin: 0;
 }
 
-/* 90s/2000s Bloom Background */
+/* Background & Bloom */
 .fallback-bg {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    z-index: -1;
-    background: linear-gradient(45deg, var(--spy-purple), #ff70a6, var(--spy-cyan));
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    z-index: -2;
+    background: linear-gradient(45deg, var(--purple), #ff70a6, var(--cyan));
     background-size: 400% 400%;
-    animation: gradientMove 10s ease infinite;
-    filter: blur(40px) brightness(0.7);
+    animation: gradientMove 15s infinite;
+    filter: blur(50px) brightness(0.6);
 }
 
-@keyframes gradientMove {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
+/* TV & Screen */
 .tv-frame {
     display: flex;
-    align-items: center;
-    background: #222;
-    padding: 20px;
-    border-radius: 40px;
-    border: 4px solid var(--spy-pink);
-    box-shadow: 0 0 50px var(--spy-pink);
+    background: #1a1a1a;
+    padding: 15px;
+    border-radius: 30px;
+    border: 3px solid var(--pink);
+    box-shadow: 0 0 30px var(--pink);
 }
 
-.tv-screen {
-    width: 600px;
-    height: 400px;
+.screen-area {
+    width: 80vw; max-width: 600px;
+    height: 50vw; max-height: 400px;
     background: #000;
-    border: 10px solid #333;
     position: relative;
-    box-shadow: inset 0 0 30px var(--spy-cyan);
+    overflow: hidden;
+    border: 8px solid #333;
+}
+
+#static-canvas {
+    position: absolute; top:0; left:0; width:100%; height:100%; z-index: 2;
 }
 
 video { width: 100%; height: 100%; object-fit: cover; }
 
 /* Blinking Lights */
-.light {
-    width: 12px; height: 12px;
-    margin: 20px 5px;
-    border-radius: 50%;
-    animation: blink 0.8s infinite alternate;
+.lights-side span {
+    display: block; width: 10px; height: 10px; border-radius: 50%;
+    margin: 20px 5px; background: var(--cyan);
+    box-shadow: 0 0 10px var(--cyan);
+    animation: blink 0.5s infinite alternate;
 }
-.pink { background: var(--spy-pink); box-shadow: 0 0 10px var(--spy-pink); }
-.cyan { background: var(--spy-cyan); box-shadow: 0 0 10px var(--spy-cyan); animation-delay: 0.4s; }
 
-@keyframes blink { from { opacity: 0.2; } to { opacity: 1; } }
+/* UI Panels */
+.overlay {
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.9); z-index: 10;
+    display: flex; justify-content: center; align-items: center;
+}
 
-.info-panel { margin-top: 20px; text-align: center; text-transform: uppercase; }
-.hidden { display: none; }
+.panel-content {
+    background: #222; padding: 30px; border: 2px solid var(--cyan);
+    border-radius: 20px; display: flex; flex-direction: column; gap: 10px;
+}
+
+.hidden { display: none !important; }
+
+@keyframes blink { from { opacity: 0.3; } to { opacity: 1; } }
