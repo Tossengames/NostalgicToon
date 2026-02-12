@@ -2,70 +2,62 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Nostalgia TV</title>
   <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 </head>
 <body>
 
-<!-- TV VIEW -->
 <section id="tv" class="view active">
-  
-  <div class="tv-frame">
-    <div class="tv-screen-container">
-      <div class="tv-screen">
+  <div class="tv-unit">
+    <div class="tv-body">
+      <div class="screen-area">
         <div class="noise"></div>
-        <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        <div class="scanlines"></div>
+        <iframe id="player" allow="autoplay; encrypted-media"></iframe>
+      </div>
+      
+      <div class="side-panel">
+        <div class="knob-container">
+            <button id="btnSwitch" class="knob">
+                <div class="knob-indicator"></div>
+                🔄
+            </button>
+        </div>
+        <div class="small-btns">
+            <button id="btnShowName" title="OSD Toggle">!</button>
+            <button id="btnInfo" title="About">ℹ️</button>
+            <button id="btnSubmit" title="Contribute">📤</button>
+        </div>
       </div>
     </div>
+    
+    <div class="meta-display">
+        <div class="osd" id="meta">INITIALIZING...</div>
+    </div>
   </div>
-
-  <div class="meta-badge" id="meta"></div>
-
-  <div class="control-bar">
-    <button id="btnInfo" class="control-btn">ℹ️</button>
-    <button id="btnSubmit" class="control-btn">📤</button>
-    <button id="btnShowName" class="control-btn">👤</button>
-    <button id="btnSwitch" class="control-btn play-btn">▶</button>
-  </div>
-
 </section>
 
-<!-- SUBMIT VIEW – SIMPLIFIED -->
 <section id="submit" class="view">
-  <div class="form-card">
-    <h2>Submit a memory</h2>
-    <p class="form-sub">Share a video from your past</p>
-
-    <!-- ONLY TWO FIELDS -->
-    <div class="input-group">
-      <label>Video Link</label>
-      <input id="s_link" type="url" placeholder="https://youtube.com/watch?v=..." />
-    </div>
-
-    <div class="input-group">
-      <label>Your Name</label>
-      <input id="s_name" type="text" placeholder="Anonymous" />
-    </div>
-
-    <button id="btnSend" class="submit-button" disabled>Submit video</button>
-    <button class="back-button" onclick="showTV()">← Back to TV</button>
+  <div class="retro-card">
+    <div class="terminal-header">TRANSMIT SIGNAL</div>
+    <input id="s_link" placeholder="PASTE YOUTUBE LINK HERE" />
+    <input id="s_name" placeholder="YOUR NAME / HANDLE" />
+    <button id="btnSend" class="glitch-btn">BROADCAST NOW</button>
+    <button class="back-link" onclick="showTV()">[ RETURN TO FEED ]</button>
   </div>
 </section>
 
-<!-- INFO OVERLAY -->
 <div id="info" class="overlay">
-  <div class="info-card">
-    <h3>Nostalgia TV</h3>
-    <div class="divider"></div>
-    <p>A community-powered archive of memories.</p>
-    <p>Videos play randomly, 24/7.</p>
-    <p class="credit">Thanks to everyone who contributes ❤️</p>
-    <button onclick="closeInfo()" class="close-btn">Got it</button>
+  <div class="retro-card">
+    <div class="terminal-header">STATION INFO</div>
+    <p>Broadcasting random analog memories.</p>
+    <p>Data Source: Google Sheets</p>
+    <button class="glitch-btn" onclick="closeInfo()">EXIT MENU</button>
   </div>
 </div>
 
-<!-- SFX -->
 <audio id="sfxClick" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_4b77a0a9d5.mp3"></audio>
 <audio id="sfxStatic" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_5c68b1c0b0.mp3"></audio>
 
