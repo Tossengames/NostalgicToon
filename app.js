@@ -1,115 +1,91 @@
 // === CONFIG ===
-// 1. PASTE YOUR PUBLISHED CSV LINK HERE:
-const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1mVgVFSpT4fb6HTf4-8fi_fxDXReZ69LUOI5vGdo0DPU/pub?output=csv';
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTYVsilo654qcbY8lRVyYDjIDyHHYFluy_2sVZmQWEBHbGfF6t3cpN9sC0kroL9izednFK0IwmJFbyg/pub?gid=314817228&single=true&output=csv';
 
-const FORM_ACTION_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSebUTZIz5BC-l3I_iX9zguGN6XcoZ12ocZh6MvbWulyNCQ7ww/formResponse';
-const DEFAULT_VIDEO = 'https://youtube.com/shorts/b9LB6XlmqsM';
-
-// IDs from your pre-filled link
-const ENTRY_LINK = 'entry.873128711';
-const ENTRY_NAME = 'entry.3875702';
-
-// STATE
-let videos = [];
 const player = document.getElementById('player');
 const meta = document.getElementById('meta');
-const click = document.getElementById('sfxClick');
 const staticSfx = document.getElementById('sfxStatic');
 
-function sfx() { click.currentTime = 0; click.play(); }
+let videos = [];
 
-function osdMsg(text) {
-    const originalText = meta.innerText;
-    meta.innerText = `>> ${text.toUpperCase()}`;
-    setTimeout(() => { meta.innerText = originalText; }, 3000);
-}
-
-// NAVIGATION
-function showTV() { sfx(); document.getElementById('tv').classList.add('active'); document.getElementById('submit').classList.remove('active'); }
-function showSubmit() { sfx(); document.getElementById('submit').classList.add('active'); document.getElementById('tv').classList.remove('active'); }
-
-// LOAD DATA FROM YOUR SHEET
+// 1. FETCH THE DATA
 async function loadVideos() {
     try {
-        // We add a timestamp to the URL to prevent the browser from caching old data
-        const response = await fetch(`${SHEET_CSV_URL}&cachebust=${Date.now()}`);
+        // cachebust ensures it doesn't load an old version of your sheet
+        const response = await fetch(`${SHEET_CSV_URL}&t=${Date.now()}`);
         const data = await response.text();
         
-        // CSV Parsing
-        const rows = data.split('\n').slice(1); // Skip Header
+        // Split rows and remove the header (Row 1)
+        const rows = data.split('\n').slice(1); 
+        
         videos = rows.map(row => {
-            // Handles potential commas in names
+            // Regex to handle commas inside quotes
             const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            
+            /* MAPPING CHECK:
+               If your sheet is: Timestamp (A), Link (B), Name (C)
+               Use: cols[1] and cols[2]
+               
+               If your sheet is JUST: Link (A), Name (B)
+               Use: cols[0] and cols[1]
+            */
             return {
-                url: cols[1] ? cols[1].replace(/"/g, '').trim() : null, // Column B (Link)
-                by: cols[2] ? cols[2].replace(/"/g, '').trim() : 'ANON'   // Column C (Name)
+                url: cols[1] ? cols[1].replace(/"/g, '').trim() : null, 
+                by: cols[2] ? cols[2].replace(/"/g, '').trim() : 'ANONYMOUS'
             };
         }).filter(v => v.url && v.url.includes('http'));
 
-        console.log("Loaded videos:", videos.length);
-        playRandom(); // Start the first video
+        if (videos.length > 0) {
+            playRandom();
+        } else {
+            meta.innerText = "OSD: NO SIGNAL DETECTED";
+        }
     } catch (e) {
-        console.error("Load failed:", e);
-        osdMsg("SIGNAL ERROR");
-        playRandom(); // Fallback to default
+        console.error(e);
+        meta.innerText = "OSD: TUNER ERROR";
     }
 }
 
+// 2. PLAY RANDOM VIDEO
 function playRandom() {
-    // Pick from your sheet, or use default if sheet is empty/failed
-    let selected = (videos.length > 0) 
-        ? videos[Math.floor(Math.random() * videos.length)] 
-        : { url: DEFAULT_VIDEO, by: 'SYSTEM' };
+    if (videos.length === 0) return;
 
-    staticSfx.play();
+    // Pick random entry
+    const selected = videos[Math.floor(Math.random() * videos.length)];
+
+    // Play static sound
+    if (staticSfx) {
+        staticSfx.currentTime = 0;
+        staticSfx.play();
+    }
+    
+    // Update OSD text
     meta.innerText = `OSD: SOURCE [${selected.by.toUpperCase()}]`;
     
+    // Video transition
     player.style.opacity = 0;
-    let videoId = extractID(selected.url);
-    player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&rel=0&modestbranding=1`;
     
-    // Fade in after "static" transition
-    setTimeout(() => player.style.opacity = 1, 1200);
+    let videoId = extractID(selected.url);
+    // Parameters: autoplay, no controls, hide related videos
+    player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&rel=0&modestbranding=1&iv_load_policy=3`;
+    
+    setTimeout(() => {
+        player.style.opacity = 1;
+    }, 1200);
 }
 
+// 3. EXTRACT YOUTUBE ID (Works for Shorts and Regular links)
 function extractID(url) {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\/shorts\/)([^#\&\?]*).*/;
     const match = url.match(regExp);
     return (match && match[2].length === 11) ? match[2] : url;
 }
 
-// FORM SUBMISSION
-function submitNostalgia() {
-    sfx();
-    const linkVal = document.getElementById('s_link').value;
-    const nameVal = document.getElementById('s_name').value || 'Anonymous';
+// 4. BUTTON BINDING
+document.getElementById('btnSwitch').onclick = () => {
+    // Play the 'click' sound effect if it exists
+    if(typeof sfx === "function") sfx(); 
+    playRandom();
+};
 
-    if(!linkVal.includes('http')) {
-        osdMsg("INVALID URL");
-        return;
-    }
-
-    document.getElementById('f_link').value = linkVal;
-    document.getElementById('f_name').value = nameVal;
-    document.getElementById('submissionForm').submit();
-
-    osdMsg("SIGNAL TRANSMITTED");
-    
-    document.getElementById('s_link').value = '';
-    document.getElementById('s_name').value = '';
-    
-    // Refresh the video list after submission (slight delay for Google to process)
-    setTimeout(() => {
-        loadVideos(); 
-        showTV();
-    }, 2000);
-}
-
-// BINDINGS
-document.getElementById('btnSwitch').onclick = () => { sfx(); playRandom(); };
-document.getElementById('btnSubmit').onclick = showSubmit;
-document.getElementById('btnSend').onclick = submitNostalgia;
-document.getElementById('btnShowName').onclick = () => { sfx(); meta.style.display = meta.style.display === 'none' ? 'block' : 'none'; };
-
-// BOOT UP
+// INITIALIZE
 loadVideos();
