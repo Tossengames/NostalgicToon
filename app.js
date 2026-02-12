@@ -1,54 +1,14 @@
 // ======================
-// AUDIO (90s TECH STYLE)
+// CONFIG
 // ======================
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+const SHEET_URL =
+  "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/pub?output=csv";
 
-function clickBeep(freq = 900, duration = 0.05) {
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  osc.frequency.value = freq;
-  osc.type = "square";
-  gain.gain.value = 0.05;
-  osc.connect(gain).connect(audioCtx.destination);
-  osc.start();
-  osc.stop(audioCtx.currentTime + duration);
-}
+const MAX_PLAY_TIME = 25; // seconds
 
-function staticNoise(duration = 0.3) {
-  const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * duration, audioCtx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let i = 0; i < data.length; i++) {
-    data[i] = Math.random() * 2 - 1;
-  }
-  const src = audioCtx.createBufferSource();
-  src.buffer = buffer;
-  src.connect(audioCtx.destination);
-  src.start();
-}
-
-// ======================
-// DATA (SHORT TEST CLIPS)
-// ======================
-const videos = [
-  {
-    title: "90s Commercial Vibe",
-    author: "Archive",
-    url: "https://media.w3.org/2010/05/sintel/trailer.mp4",
-    hour: null
-  },
-  {
-    title: "Old Cartoon Energy",
-    author: "Retro",
-    url: "https://media.w3.org/2010/05/bunny/trailer.mp4",
-    hour: null
-  },
-  {
-    title: "Late Night TV Mood",
-    author: "Night",
-    url: "https://media.w3.org/2010/05/video/movie_300.mp4",
-    hour: 23
-  }
-];
+let videos = [];
+let forceTimer = null;
+let showInfo = true;
 
 // ======================
 // ELEMENTS
@@ -57,22 +17,68 @@ const videoEl = document.getElementById("video");
 const titleEl = document.getElementById("title");
 const infoEl = document.getElementById("info");
 const clockEl = document.getElementById("clock");
-const tv = document.getElementById("tv");
 
-let showInfo = true;
+// ======================
+// AUDIO (OLD TECH STYLE)
+// ======================
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function beep(freq = 900, dur = 0.05) {
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = "square";
+  o.frequency.value = freq;
+  g.gain.value = 0.05;
+  o.connect(g).connect(audioCtx.destination);
+  o.start();
+  o.stop(audioCtx.currentTime + dur);
+}
+
+function staticNoise(dur = 0.25) {
+  const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * dur, audioCtx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+  const src = audioCtx.createBufferSource();
+  src.buffer = buf;
+  src.connect(audioCtx.destination);
+  src.start();
+}
 
 // ======================
 // CLOCK
 // ======================
-function updateClock() {
-  const now = new Date();
-  clockEl.textContent = now.toLocaleTimeString([], {
+setInterval(() => {
+  clockEl.textContent = new Date().toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit"
   });
+}, 1000);
+
+// ======================
+// LOAD SHEET DATA
+// ======================
+async function loadVideos() {
+  const res = await fetch(SHEET_URL);
+  const text = await res.text();
+
+  videos = text
+    .trim()
+    .split("\n")
+    .slice(1)
+    .map(row => {
+      const [approved, title, author, url, hour] =
+        row.split(",").map(v => v.replace(/^"|"$/g, "").trim());
+
+      return {
+        approved: approved === "yes",
+        title,
+        author,
+        url,
+        hour: hour === "" ? null : Number(hour)
+      };
+    })
+    .filter(v => v.approved && v.url);
 }
-setInterval(updateClock, 1000);
-updateClock();
 
 // ======================
 // VIDEO LOGIC
@@ -83,44 +89,48 @@ function validVideos() {
 }
 
 function playRandom() {
+  if (!videos.length) return;
+
   const pool = validVideos();
   if (!pool.length) return;
 
-  const pick = pool[Math.floor(Math.random() * pool.length)];
-  titleEl.textContent = `▸ ${pick.title} – by ${pick.author}`;
+  const v = pool[Math.floor(Math.random() * pool.length)];
+  titleEl.textContent = `▸ ${v.title} – by ${v.author}`;
 
-  videoEl.src = pick.url;
-  videoEl.load();
+  videoEl.src = v.url;
   videoEl.play();
+
+  if (forceTimer) clearTimeout(forceTimer);
+  forceTimer = setTimeout(() => {
+    staticNoise();
+    playRandom();
+  }, MAX_PLAY_TIME * 1000);
 }
+
+videoEl.onended = () => {
+  if (forceTimer) clearTimeout(forceTimer);
+  staticNoise(0.2);
+  playRandom();
+};
 
 // ======================
 // CONTROLS
 // ======================
 document.getElementById("switch").onclick = () => {
   audioCtx.resume();
-  clickBeep(700);
+  beep(700);
   staticNoise();
-  tv.classList.add("switching");
-  videoEl.pause();
-  setTimeout(() => {
-    playRandom();
-    tv.classList.remove("switching");
-  }, 400);
+  playRandom();
 };
 
 document.getElementById("toggleInfo").onclick = () => {
   audioCtx.resume();
-  clickBeep(1200, 0.04);
+  beep(1200, 0.04);
   showInfo = !showInfo;
   infoEl.style.opacity = showInfo ? 1 : 0;
 };
 
-// Auto-play next
-videoEl.onended = () => {
-  staticNoise(0.2);
-  playRandom();
-};
-
-// Start
-playRandom();
+// ======================
+// START
+// ======================
+loadVideos().then(playRandom);
