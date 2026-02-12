@@ -1,7 +1,6 @@
 // === CONFIG ===
-const SHEET_ID = '1l3NChHHcKJzYW9dK8mbb60ASmf7vrd9yxXn2tNfSaz0';
-const FORM_URL = 'PASTE_YOUR_GOOGLE_FORM_URL_HERE';
-const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+const SHEET_ID = '1l3NChHHcKJzYW9dK8mbb60ASmf7vrd9yxXn2tNfSaz0'; // ✅ Your sheet ID
+const FORM_URL = 'PASTE_YOUR_GOOGLE_FORM_URL_HERE'; // ⚠️ REPLACE THIS
 const PLAY_TIME = 25000; // 25 seconds
 
 // === STATE ===
@@ -16,9 +15,9 @@ const player = document.getElementById('player');
 const meta = document.getElementById('meta');
 const click = document.getElementById('sfxClick');
 const staticSfx = document.getElementById('sfxStatic');
-const info = document.getElementById('info'); // declared for closeInfo
+const info = document.getElementById('info');
 
-// === UI FUNCTIONS (fully preserved) ===
+// === UI FUNCTIONS ===
 function sfx() { click.currentTime = 0; click.play(); }
 function showTV() { sfx(); tv.classList.add('active'); submit.classList.remove('active'); }
 function showSubmit() { sfx(); submit.classList.add('active'); tv.classList.remove('active'); }
@@ -32,19 +31,19 @@ function hour(t, v) {
   else { endH = (endH + v + 24) % 24; document.getElementById('h_end').innerText = endH; }
 }
 
-// === LOAD SHEET ===
-fetch(SHEET_URL)
+// === LOAD SHEET – UPDATED FOR 7 COLUMNS (Timestamp at index 0) ===
+fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`)
   .then(r => r.text())
   .then(t => {
     const json = JSON.parse(t.substring(47).slice(0, -2));
     videos = json.table.rows
       .map(r => ({
-        url: r.c[0]?.v,
-        title: r.c[1]?.v,
-        by: r.c[2]?.v || 'Anonymous',
-        start: r.c[3]?.v ?? 0,
-        end: r.c[4]?.v ?? 23,
-        ok: r.c[5]?.v === true
+        url: r.c[1]?.v,      // ✅ Column B (Video Link)
+        title: r.c[2]?.v,    // ✅ Column C (Title)
+        by: r.c[3]?.v || 'Anonymous', // ✅ Column D (Submitted By)
+        start: r.c[4]?.v ?? 0,        // ✅ Column E (Start Hour)
+        end: r.c[5]?.v ?? 23,         // ✅ Column F (End Hour)
+        ok: r.c[6]?.v === true        // ✅ Column G (Approved)
       }))
       .filter(v => v.ok);
     playRandom();
@@ -65,7 +64,7 @@ function playRandom() {
   setTimeout(() => player.src = '', PLAY_TIME);
 }
 
-// === SUBMISSION (preserved – keep IDs) ===
+// === SUBMISSION (Update with YOUR entry IDs) ===
 const link = document.getElementById('s_link');
 const title = document.getElementById('s_title');
 const s_name = document.getElementById('s_name');
@@ -78,24 +77,24 @@ link.oninput = title.oninput = validate;
 btnSend.onclick = () => {
   sfx();
   const params = new URLSearchParams({
-    'entry.111': link.value,
-    'entry.222': title.value,
-    'entry.333': s_name.value,
-    'entry.444': s_email.value,
-    'entry.555': startH,
-    'entry.666': endH
+    'entry.3333333333': link.value,   // ⚠️ REPLACE with your Video Link entry ID
+    'entry.1234567890': title.value,  // ⚠️ REPLACE with your Title entry ID
+    'entry.9876543210': s_name.value, // ⚠️ REPLACE with your Name entry ID
+    'entry.5555555555': s_email.value,// ⚠️ REPLACE with your Email entry ID
+    'entry.1111111111': startH,       // ⚠️ REPLACE with your Start Hour entry ID
+    'entry.2222222222': endH          // ⚠️ REPLACE with your End Hour entry ID
   });
   window.open(FORM_URL + '?' + params.toString(), '_blank');
   showTV();
 };
 
-// === BUTTON EVENTS (all original handlers) ===
+// === BUTTON EVENTS ===
 document.getElementById('btnSwitch').onclick = () => { sfx(); playRandom(); };
 document.getElementById('btnSubmit').onclick = showSubmit;
 document.getElementById('btnInfo').onclick = () => { sfx(); info.classList.add('active'); };
 document.getElementById('btnShowName').onclick = toggleName;
 
-// attach hour functions globally (used inline)
+// Expose globals
 window.hour = hour;
 window.showTV = showTV;
 window.closeInfo = closeInfo;
