@@ -2,97 +2,100 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Nostalgia TV</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes" />
+  <title>Nostalgia TV · Retro Stream</title>
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 </head>
 <body>
 
+<!-- ========== TV VIEW ========== -->
 <section id="tv" class="view active">
-  <div class="tv-unit">
-    <div class="tv-top"><span>NOSTALGIA-COLOR DELUXE</span></div>
-    
-    <div class="tv-body">
-      <div class="screen-area">
-        <div class="glass-reflection"></div>
+  <!-- CRT SCREEN + FRAME -->
+  <div class="tv-cabinet">
+    <div class="tv-screen-border">
+      <div class="screen-reflection"></div>
+      <div class="screen">
         <div class="noise"></div>
         <div class="scanlines"></div>
         <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
       </div>
+    </div>
+    <!-- decorative knobs / retro vibe -->
+    <div class="tv-knobs">
+      <span class="knob"></span>
+      <span class="knob"></span>
+      <span class="knob small"></span>
+    </div>
+  </div>
 
-      <div class="side-panel">
-        <div class="speaker-grill"></div>
-        
-        <div class="knob-container">
-          <button id="btnSwitch" class="knob" title="Switch Channel">
-            <div class="knob-indicator"></div>
-            <span class="icon">🔄</span>
-          </button>
-          <label>CHANNEL</label>
+  <!-- META INFO (fades in) -->
+  <div class="meta-wrapper" id="meta"></div>
+
+  <!-- BUTTONS – repositioned for modern UX / mobile friendly -->
+  <div class="tv-controls">
+    <button id="btnInfo" class="ctrl info" aria-label="info">ℹ️</button>
+    <button id="btnSubmit" class="ctrl submit" aria-label="submit video">📤</button>
+    <button id="btnShowName" class="ctrl name-badge" aria-label="toggle name">!</button>
+    <button id="btnSwitch" class="ctrl shuffle" aria-label="next random">⬅️➡️</button>
+  </div>
+</section>
+
+<!-- ========== SUBMIT VIEW ========== -->
+<section id="submit" class="view">
+  <div class="card glass">
+    <h2>📼 submit nostalgia</h2>
+    <p class="subhead">share a memory · every VHS counts</p>
+
+    <label>🔗 video link *</label>
+    <input id="s_link" type="url" placeholder="https://youtube.com/watch?v=..." />
+
+    <label>🏷️ video title *</label>
+    <input id="s_title" type="text" placeholder="90s commercial, cartoon …" />
+
+    <label>👤 your name</label>
+    <input id="s_name" type="text" placeholder="anonymous VHS hero" />
+
+    <label>📧 email</label>
+    <input id="s_email" type="email" placeholder="not shared (optional)" />
+
+    <div class="hour-pair">
+      <div class="hour-control">
+        <label>⏱️ start hour</label>
+        <div class="hour-buttons">
+          <button onclick="hour('start',-1)" class="minimal">−</button>
+          <span id="h_start">0</span>
+          <button onclick="hour('start',1)" class="minimal">+</button>
         </div>
-
-        <div class="small-btns">
-            <button id="btnShowName" title="OSD Toggle">!</button>
-            <button id="btnInfo" title="Manual">ℹ️</button>
-            <button id="btnSubmit" title="Feed">📤</button>
+      </div>
+      <div class="hour-control">
+        <label>⏱️ end hour</label>
+        <div class="hour-buttons">
+          <button onclick="hour('end',-1)" class="minimal">−</button>
+          <span id="h_end">23</span>
+          <button onclick="hour('end',1)" class="minimal">+</button>
         </div>
       </div>
     </div>
-    
-    <div class="meta-display">
-        <div class="osd" id="meta">VCR - PLAY</div>
-    </div>
+
+    <button id="btnSend" class="submit-btn" disabled>📀 SUBMIT</button>
+    <button class="back-btn" onclick="showTV()">← return to tv</button>
   </div>
 </section>
 
-<section id="submit" class="view">
-  <div class="retro-card">
-    <h2>TRANSMISSION FEED</h2>
-    <div class="input-group">
-        <label>VIDEO LINK</label>
-        <input id="s_link" placeholder="YouTube/Archive URL" />
-    </div>
-    <div class="input-group">
-        <label>PROGRAM TITLE</label>
-        <input id="s_title" placeholder="90s Cereal Ad..." />
-    </div>
-    <div class="row">
-        <div class="input-group"><label>SENDER</label><input id="s_name" /></div>
-        <div class="input-group"><label>CONTACT</label><input id="s_email" /></div>
-    </div>
-    <div class="hour-wrap">
-        <div class="h-box">
-            <label>START</label>
-            <div class="h-ctrl">
-                <button onclick="hour('start',-1)">-</button>
-                <span id="h_start">0</span>
-                <button onclick="hour('start',1)">+</button>
-            </div>
-        </div>
-        <div class="h-box">
-            <label>END</label>
-            <div class="h-ctrl">
-                <button onclick="hour('end',-1)">-</button>
-                <span id="h_end">23</span>
-                <button onclick="hour('end',1)">+</button>
-            </div>
-        </div>
-    </div>
-    <button id="btnSend" disabled>UPLOAD SIGNAL</button>
-    <button class="back-link" onclick="showTV()">RETURN TO BROADCAST</button>
-  </div>
-</section>
-
+<!-- ========== INFO OVERLAY ========== -->
 <div id="info" class="overlay">
-  <div class="retro-card info-box">
-    <h3>STATION INFO</h3>
-    <p>Broadcasting random analog memories 24/7.</p>
-    <p>Curated by the community.</p>
-    <button onclick="closeInfo()">EXIT MENU</button>
+  <div class="card glass overlay-card">
+    <h3>📺 nostalgia tv</h3>
+    <p>a community-powered time machine.</p>
+    <p>random memories · random hours</p>
+    <div class="divider"></div>
+    <p>thanks to every contributor ❤️</p>
+    <p class="small">VHS static & click sounds included</p>
+    <button onclick="closeInfo()" class="close-overlay">⏻ close</button>
   </div>
 </div>
 
+<!-- SFX (unchanged) -->
 <audio id="sfxClick" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_4b77a0a9d5.mp3"></audio>
 <audio id="sfxStatic" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_5c68b1c0b0.mp3"></audio>
 
