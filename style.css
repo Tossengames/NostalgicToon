@@ -1,5 +1,5 @@
 *{box-sizing:border-box}
-body{margin:0;background:#050505;color:#0ff;font-family:monospace}
+body{margin:0;background:#050505;color:#0ff;font-family:monospace;background-size:cover;background-position:center}
 .view{display:none;min-height:100vh;justify-content:center;align-items:center;flex-direction:column}
 .view.active{display:flex}
 
@@ -8,10 +8,13 @@ body{margin:0;background:#050505;color:#0ff;font-family:monospace}
 .screen iframe{width:100%;height:100%;border:0;opacity:1;transition:opacity 1s}
 .noise{position:absolute;inset:0;background:url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif');opacity:.15;pointer-events:none}
 
-.controls{display:flex;gap:12px;margin-top:15px}
+.controls{display:flex;gap:12px;margin-top:15px;position:relative;width:100%}
 button{background:#000;color:#0ff;border:2px solid #0ff;padding:10px 14px;cursor:pointer}
 button:hover{box-shadow:0 0 10px #0ff}
 button:disabled{opacity:.4;cursor:not-allowed}
+button.centered{margin:0 auto;display:block}
+button.corner{position:absolute;top:10px;right:10px}
+button.side{position:absolute;top:10px;left:10px}
 
 .meta{margin-top:10px;font-size:14px;text-align:center}
 
