@@ -2,49 +2,50 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Retro Spy TV Player</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Spy TV</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="bg-container" class="fallback-bg"></div>
 
-    <div class="main-container">
-        <h1 id="top-title">SPY-VISION OS</h1>
+    <div class="main-wrapper">
+        <h1 class="tv-title">SPY-VISION PRO</h1>
 
-        <div class="tv-frame">
-            <div class="side-lights left">
-                <div class="light pink"></div>
-                <div class="light cyan"></div>
+        <div class="tv-container">
+            <div class="tv-frame">
+                <div class="lights-side left"><span></span><span></span></div>
+                
+                <div class="screen-area">
+                    <canvas id="static-canvas"></canvas>
+                    <video id="main-video" loop playsinline></video>
+                    <div class="crt-overlay"></div>
+                </div>
+
+                <div class="lights-side right"><span></span><span></span></div>
             </div>
             
-            <div class="tv-screen">
-                <video id="main-video" src="your-video.mp4" loop></video>
-                <div class="screen-glow"></div>
-            </div>
-
-            <div class="side-lights right">
-                <div class="light cyan"></div>
-                <div class="light pink"></div>
+            <div id="video-info" class="info-text hidden">
+                <h2 id="display-name">NO SIGNAL</h2>
+                <p id="display-uploader">Please Switch Channel</p>
             </div>
         </div>
 
-        <div id="video-info" class="info-panel hidden">
-            <h2 id="display-name">Video Title</h2>
-            <p id="display-uploader">Uploader: Unknown</p>
+        <div class="button-grid">
+            <button class="btn spy-btn" onclick="switchChannel()">SWITCH CHANNEL</button>
+            <button class="btn" onclick="toggleInfo()">INFO</button>
+            <button class="btn" onclick="openSubmit()">ADD VIDEO</button>
         </div>
+    </div>
 
-        <div class="controls">
-            <button onclick="toggleInfo()">INFO</button>
-            <button onclick="initAudio()">POWER ON / 8D START</button>
-        </div>
-
-        <hr>
-
-        <div class="submit-area">
-            <input type="text" id="input-url" placeholder="Video URL">
+    <div id="submit-panel" class="overlay hidden">
+        <div class="panel-content">
+            <button class="close-btn" onclick="closeSubmit()">&times;</button>
+            <h3>ENCRYPT NEW DATA</h3>
+            <input type="text" id="input-url" placeholder="Video URL (.mp4)">
             <input type="text" id="input-name" placeholder="Video Name">
             <input type="text" id="input-uploader" placeholder="Uploader Name">
-            <button onclick="loadVideo()">SUBMIT</button>
+            <button class="btn submit-final" onclick="submitVideo()">SUBMIT TO DISK</button>
         </div>
     </div>
 
