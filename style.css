@@ -1,33 +1,32 @@
 body {
-  background: #050508;
-  color: #eee;
+  background: radial-gradient(#050510, #000);
+  color: #7ff;
   font-family: monospace;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   padding-top: 20px;
 }
 
 #clock {
-  color: #6ff;
   text-shadow: 0 0 10px #0ff;
 }
 
 #tv {
-  background: #111;
   padding: 18px;
-  border-radius: 20px;
-  box-shadow: 0 0 40px rgba(0,255,255,0.2);
+  background: #111;
+  border-radius: 24px;
+  box-shadow: 0 0 60px rgba(0,255,255,0.25);
 }
 
 #screen {
   position: relative;
-  width: 320px;
+  width: 340px;
   aspect-ratio: 4 / 3;
   background: black;
   overflow: hidden;
-  border-radius: 10px;
+  border-radius: 12px;
 }
 
 #video {
@@ -36,42 +35,67 @@ body {
   object-fit: cover;
 }
 
-#static {
+#noise {
   position: absolute;
   inset: 0;
   background:
     repeating-linear-gradient(
       to bottom,
-      rgba(255,255,255,0.05),
-      rgba(255,255,255,0.05) 1px,
+      rgba(255,255,255,0.04),
+      rgba(255,255,255,0.04) 1px,
       transparent 1px,
       transparent 3px
     );
+  opacity: 0.25;
   pointer-events: none;
-  opacity: 0.2;
+}
+
+#flicker {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.05);
+  opacity: 0;
+  animation: flicker 0.15s infinite;
+  pointer-events: none;
+}
+
+@keyframes flicker {
+  0% { opacity: 0.02; }
+  50% { opacity: 0.08; }
+  100% { opacity: 0.02; }
 }
 
 #info {
-  min-height: 20px;
-  opacity: 1;
-  transition: opacity 0.3s;
+  min-height: 22px;
+  transition: opacity 0.25s;
 }
 
 #controls {
   display: flex;
-  gap: 10px;
+  gap: 12px;
 }
 
 button {
   background: #111;
   color: #0ff;
   border: 1px solid #0ff;
-  padding: 6px 12px;
+  padding: 8px 14px;
   cursor: pointer;
-  box-shadow: 0 0 10px rgba(0,255,255,0.4);
+  box-shadow: 0 0 12px rgba(0,255,255,0.4);
+  transition: transform 0.05s, box-shadow 0.1s;
 }
 
-button:hover {
-  background: #0ff;
-  color: #000;
+button:active {
+  transform: scale(0.96);
+  box-shadow: 0 0 24px rgba(0,255,255,0.8);
+}
+
+.switching #screen {
+  animation: flash 0.3s;
+}
+
+@keyframes flash {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(1.8); }
+  100% { filter: brightness(1); }
 }
