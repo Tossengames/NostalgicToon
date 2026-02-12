@@ -31,36 +31,40 @@
 
 </section>
 
-<!-- SUBMIT VIEW -->
+<!-- ===== SUBMIT VIEW – UPDATED TO MATCH YOUR GOOGLE FORM EXACTLY ===== -->
 <section id="submit" class="view">
   <div class="form-card">
     <h2>Submit a memory</h2>
     <p class="form-sub">Share a video from your past</p>
 
+    <!-- Email field – NOW FIRST (matches your Form) -->
     <div class="input-group">
-      <label>Video link</label>
+      <label>Email</label>
+      <input id="s_email" type="email" placeholder="your@email.com" />
+    </div>
+
+    <!-- Video Link -->
+    <div class="input-group">
+      <label>Video Link</label>
       <input id="s_link" type="url" placeholder="https://youtube.com/watch?v=..." />
     </div>
 
+    <!-- Video Title -->
     <div class="input-group">
-      <label>Video title</label>
+      <label>Video Title</label>
       <input id="s_title" type="text" placeholder="e.g. 90s Coca-Cola Ad" />
     </div>
 
-    <div class="row">
-      <div class="input-group half">
-        <label>Your name</label>
-        <input id="s_name" type="text" placeholder="Anonymous" />
-      </div>
-      <div class="input-group half">
-        <label>Email</label>
-        <input id="s_email" type="email" placeholder="optional" />
-      </div>
+    <!-- Your Name -->
+    <div class="input-group">
+      <label>Your Name</label>
+      <input id="s_name" type="text" placeholder="Anonymous" />
     </div>
 
+    <!-- Start Hour + End Hour side by side -->
     <div class="row">
       <div class="input-group half">
-        <label>Start hour</label>
+        <label>Start Hour</label>
         <div class="hour-selector">
           <button onclick="hour('start',-1)" class="hour-btn">−</button>
           <span id="h_start">0</span>
@@ -68,7 +72,7 @@
         </div>
       </div>
       <div class="input-group half">
-        <label>End hour</label>
+        <label>End Hour</label>
         <div class="hour-selector">
           <button onclick="hour('end',-1)" class="hour-btn">−</button>
           <span id="h_end">23</span>
