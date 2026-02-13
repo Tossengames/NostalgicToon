@@ -23,7 +23,7 @@
 <section id="tv" class="view active">
   <div class="tv-unit">
     <div class="tv-top">
-      <span class="model">NOSTALGIA-TV</span>
+      <span class="model animated-title">NOSTALGIA-TV</span>
       <span class="now-playing" id="nowPlayingTitle"></span>
     </div>
     <div class="tv-body">
@@ -39,25 +39,26 @@
         <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
       </div>
       <div class="side-panel">
-        <div class="button-row top-row">
-          <button id="btnInfo" class="action-btn about-btn">📻 ABOUT</button>
-          <button id="btnShowName" class="action-btn info-btn">📋 INFO</button>
+        <!-- Info Display - Top (below screen) -->
+        <div class="info-section">
+          <div id="videoInfoDisplay" class="video-info-bar" style="display: none;"></div>
         </div>
         
-        <div class="button-row middle-row">
+        <!-- Button Row - Middle (ABOUT, PLAY, INFO) -->
+        <div class="button-row main-row">
+          <button id="btnInfo" class="action-btn about-btn">📻 ABOUT</button>
           <button id="btnSwitch" class="play-btn">
             <span class="play-icon">▶</span>
             <span class="play-text">PLAY</span>
           </button>
+          <button id="btnShowName" class="action-btn info-btn">📋 INFO</button>
         </div>
         
-        <div class="button-row bottom-row">
-          <button id="btnSubmit" class="action-btn submit-btn">📤 UPLOAD</button>
+        <!-- Upload Button - Bottom -->
+        <div class="button-row upload-row">
+          <button id="btnSubmit" class="action-btn submit-btn upload-full">📤 UPLOAD</button>
         </div>
       </div>
-    </div>
-    <div class="meta-display">
-      <div id="videoInfoDisplay" class="video-info-bar" style="display: none;"></div>
     </div>
   </div>
 </section>
