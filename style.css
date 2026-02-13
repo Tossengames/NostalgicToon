@@ -273,17 +273,23 @@ iframe {
   justify-content: center;
   gap: 10px;
   box-shadow: 0 8px 15px rgba(0,0,0,0.5), 0 0 25px #ffaa00, inset 0 2px 5px rgba(255,255,255,0.5);
-  transition: all 0.2s ease;
+  transition: all 0.1s ease;
   padding: 0 15px;
 }
 
 .play-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.6), 0 0 35px #ffaa00, inset 0 2px 5px rgba(255,255,255,0.7);
+  transform: scale(1.02);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.6), 0 0 30px #ffaa00, inset 0 2px 5px rgba(255,255,255,0.7);
 }
 
 .play-btn:active {
   transform: scale(0.98);
+}
+
+.play-btn.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  filter: grayscale(0.5);
 }
 
 .play-icon {
@@ -300,25 +306,21 @@ iframe {
   font-family: 'VT323', monospace;
 }
 
+/* Meta display - no OSD text, only info bar */
 .meta-display { 
   margin-top: 15px; 
   background: #0a0a0a; 
-  padding: 12px; 
+  padding: 8px;
   border: 2px inset #333;
   border-color: var(--neon-purple);
   width: 100%; 
   border-radius: 8px;
   box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+  min-height: auto;
 }
 
-.osd { 
-  color: var(--neon-green); 
-  font-size: 1.3rem; 
-  text-align: center; 
-  text-transform: uppercase; 
-  text-shadow: 0 0 8px var(--neon-green); 
-  min-height: 1.5rem;
-  margin-bottom: 5px;
+.osd {
+  display: none !important;
 }
 
 .video-info-bar {
@@ -326,9 +328,7 @@ iframe {
   font-size: 1.1rem;
   text-align: center;
   text-shadow: 0 0 5px var(--neon-pink);
-  padding: 5px;
-  border-top: 1px solid #333;
-  min-height: 2rem;
+  padding: 8px;
   word-break: break-word;
 }
 
@@ -359,8 +359,13 @@ iframe {
   justify-content: center; 
   align-items: center; 
   backdrop-filter: blur(10px);
+  pointer-events: none;
 }
-.overlay.active { display: flex; }
+
+.overlay.active { 
+  display: flex; 
+  pointer-events: auto;
+}
 
 .retro-card { 
   background: linear-gradient(145deg, #1a1a1a, #0a0a0a); 
@@ -371,6 +376,7 @@ iframe {
   text-align: center; 
   box-shadow: 0 0 50px rgba(255,110,199,0.4);
   border-radius: 20px;
+  pointer-events: auto;
 }
 
 .terminal-header { 
@@ -437,7 +443,7 @@ input::placeholder {
 
 .glitch-btn.active {
   opacity: 1;
-  pointer-events: all;
+  pointer-events: auto;
   background: var(--neon-blue);
   color: #000;
   box-shadow: 0 0 30px var(--neon-blue);
@@ -447,6 +453,11 @@ input::placeholder {
 .glitch-btn.active:hover {
   transform: scale(1.02);
   box-shadow: 0 0 40px var(--neon-blue);
+}
+
+.glitch-btn {
+  cursor: pointer;
+  pointer-events: auto;
 }
 
 .back-link { 
@@ -460,6 +471,7 @@ input::placeholder {
   transition: all 0.2s;
   text-decoration: underline;
   text-underline-offset: 4px;
+  pointer-events: auto;
 }
 
 .back-link:hover { 
@@ -541,34 +553,4 @@ input::placeholder {
   .play-text {
     font-size: 1.2rem;
   }
-}
-
-/* Add to style.css */
-
-/* Disabled state for play button */
-.play-btn.disabled {
-  opacity: 0.5;
-  pointer-events: none;
-  filter: grayscale(0.5);
-}
-
-/* Hide meta display completely when info is off */
-.meta-display.hidden {
-  display: none;
-}
-
-/* About overlay close button fix */
-.overlay .glitch-btn {
-  cursor: pointer;
-  pointer-events: auto;
-  position: relative;
-  z-index: 200;
-}
-
-.overlay.active {
-  pointer-events: auto;
-}
-
-.overlay .retro-card {
-  pointer-events: auto;
 }
