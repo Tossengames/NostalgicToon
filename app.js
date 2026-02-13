@@ -13,12 +13,11 @@ let videos = [];
 let showInfo = false;
 let audioInitialized = false;
 let playCooldown = false;
-let currentVideoDuration = 180; // Default 3 minutes
+let currentVideoDuration = 180;
 let stopTimeout = null;
 
 // Elements
 const player = document.getElementById('player');
-const meta = document.getElementById('meta');
 const metaDisplay = document.querySelector('.meta-display');
 const clickSfx = document.getElementById('sfxClick');
 const staticSfx = document.getElementById('sfxStatic');
@@ -32,7 +31,7 @@ const nameInput = document.getElementById('s_name');
 const submitMessage = document.getElementById('submitMessage');
 const playBtn = document.getElementById('btnSwitch');
 
-// === AUDIO INIT (FIXED FOR MOBILE) ===
+// === AUDIO INIT ===
 function initAudio() {
     if (audioInitialized) return;
     
@@ -82,14 +81,7 @@ function showSubmit() {
 function toggleVideoInfo() {
     sfx();
     showInfo = !showInfo;
-    
-    if (showInfo) {
-        videoInfoDisplay.style.display = 'block';
-        metaDisplay.classList.remove('hidden');
-    } else {
-        videoInfoDisplay.style.display = 'none';
-        metaDisplay.classList.add('hidden');
-    }
+    videoInfoDisplay.style.display = showInfo ? 'block' : 'none';
 }
 
 function openInfo() { 
@@ -104,59 +96,43 @@ function closeInfo() {
 
 // === VIDEO DURATION DETECTION ===
 function estimateVideoDuration(url) {
-    // Rough estimates based on platform
     if (url.includes('youtube.com') || url.includes('youtu.be')) {
-        return 180; // Assume 3 minutes for YouTube (will be overwritten by actual duration)
+        return 180;
     } else if (url.includes('instagram.com')) {
-        return 60; // Instagram videos usually 60 sec
+        return 60;
     } else if (url.includes('tiktok.com')) {
-        return 30; // TikTok usually 30 sec
+        return 30;
     } else if (url.includes('facebook.com') || url.includes('fb.watch')) {
-        return 120; // Facebook usually 2 min
+        return 120;
     }
-    return 120; // Default 2 minutes
+    return 120;
 }
 
-// Get random start time based on video duration
 function getRandomStartTime(duration) {
-    // Don't start in last 30 seconds
     const maxStart = Math.max(0, duration - 35);
-    // Start at least 5 seconds in
     const minStart = 5;
     
     if (maxStart <= minStart) return minStart;
-    
     return Math.floor(Math.random() * (maxStart - minStart + 1)) + minStart;
 }
 
-// Stop video after 30 seconds with static
 function stopVideoAfterDelay() {
     if (stopTimeout) clearTimeout(stopTimeout);
     
     stopTimeout = setTimeout(() => {
-        // Stop video and show static
         player.src = '';
         
         if (staticSfx && audioInitialized) {
             staticSfx.currentTime = 0;
             staticSfx.play().catch(e => console.log('Static play failed:', e));
         }
-        
-        // Enable play button again
-        playCooldown = false;
-        playBtn.classList.remove('disabled');
-        
-        osdMsg("SIGNAL LOST", 2000);
-        
-    }, 30000); // 30 seconds
+    }, 30000);
 }
 
 // === VIDEO PLAYBACK ===
 function playVideo(videoId, startTime) {
     player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=0&rel=0&modestbranding=1&iv_load_policy=3&showinfo=0&enablejsapi=1&start=${startTime}`;
     player.style.opacity = 1;
-    
-    // Stop after 30 seconds
     stopVideoAfterDelay();
 }
 
@@ -164,9 +140,14 @@ function playRandom() {
     if (playCooldown) return;
     if (videos.length === 0) return;
 
-    // Set cooldown
+    // Quick cooldown - just 500ms to prevent double clicks
     playCooldown = true;
     playBtn.classList.add('disabled');
+    
+    setTimeout(() => {
+        playCooldown = false;
+        playBtn.classList.remove('disabled');
+    }, 500);
     
     sfx();
     
@@ -182,26 +163,18 @@ function playRandom() {
     nowPlayingTitle.innerHTML = `📡 ${selected.by.toUpperCase()}`;
     
     let videoId = extractID(selected.url);
-    
-    // Estimate duration
     const duration = estimateVideoDuration(selected.url);
     const startTime = getRandomStartTime(duration);
     
     playVideo(videoId, startTime);
-    
-    osdMsg(`PLAYING: ${selected.by}`, 2000);
 }
 
 function extractID(url) {
-    // Handle different platforms
     if (url.includes('youtube.com') || url.includes('youtu.be') || url.includes('/shorts/')) {
         const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\/shorts\/)([^#\&\?]*).*/;
         const match = url.match(regExp);
         return (match && match[2].length === 11) ? match[2] : url;
     }
-    
-    // For other platforms, try to extract ID differently or return as is
-    // YouTube embed works for many platforms
     return url;
 }
 
@@ -223,12 +196,9 @@ async function loadVideos() {
 
         if (videos.length > 0) {
             playRandom();
-        } else {
-            osdMsg("NO VIDEOS YET");
         }
     } catch (e) {
         console.error("Signal fetch failed:", e);
-        osdMsg("LOAD ERROR");
     }
 }
 
@@ -236,20 +206,10 @@ async function loadVideos() {
 function isValidVideoUrl(url) {
     if (!url || !url.includes('http')) return false;
     
-    // Supported platforms
     const patterns = [
-        'youtube.com',
-        'youtu.be',
-        'instagram.com',
-        'fb.watch',
-        'facebook.com',
-        'tiktok.com',
-        'vm.tiktok.com',
-        'dailymotion.com',
-        'vimeo.com',
-        '.mp4',
-        '.webm',
-        '.mov'
+        'youtube.com', 'youtu.be', 'instagram.com', 'fb.watch',
+        'facebook.com', 'tiktok.com', 'vm.tiktok.com', 'dailymotion.com',
+        'vimeo.com', '.mp4', '.webm', '.mov'
     ];
     
     return patterns.some(pattern => url.includes(pattern));
@@ -285,37 +245,29 @@ function submitNostalgia() {
     const nameVal = nameInput.value.trim() || 'Nameless';
     
     if (!isValidVideoUrl(linkVal)) {
-        osdMsg("INVALID LINK");
         submitMessage.innerHTML = '❌ INVALID VIDEO LINK';
         submitMessage.style.color = '#ff6ec7';
         setTimeout(() => { submitMessage.innerHTML = ''; }, 2000);
         return;
     }
 
-    // Fill hidden form fields
     document.getElementById('f_link').value = linkVal;
     document.getElementById('f_name').value = nameVal;
-
-    // Submit to Google Form
     document.getElementById('submissionForm').submit();
 
-    // Play success sound
     if (successSfx && audioInitialized) {
         successSfx.currentTime = 0;
         successSfx.play().catch(e => console.log('Success sound failed:', e));
     }
 
-    // Show thanks message
     showThanksMessage();
     
-    // Clear form
     linkInput.value = '';
     nameInput.value = '';
     checkSubmitButton();
     
-    // Return to TV after delay
     setTimeout(() => {
-        loadVideos(); // Refresh list
+        loadVideos();
         showTV();
     }, 2000);
 }
@@ -331,21 +283,11 @@ document.getElementById('btnShowName').onclick = toggleVideoInfo;
 if (linkInput) linkInput.addEventListener('input', checkSubmitButton);
 if (nameInput) nameInput.addEventListener('input', checkSubmitButton);
 
-// Make sure close button works
-document.querySelectorAll('.glitch-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        if (btn.textContent.includes('EXIT') || btn.textContent.includes('CLOSE')) {
-            closeInfo();
-        }
-    });
-});
-
 // Initialize
 window.onload = () => {
-    // Hide meta display initially (info off by default)
+    // Hide info display initially
     showInfo = false;
     videoInfoDisplay.style.display = 'none';
-    metaDisplay.classList.add('hidden');
     
     loadVideos();
     initAudio();
