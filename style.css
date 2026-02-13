@@ -152,79 +152,82 @@ iframe {
   pointer-events: none; 
 }
 
-/* PANEL - NEW LAYOUT */
+/* PANEL - MOBILE FIRST (ALL IN ONE ROW) */
 .side-panel {
   flex: 1;
   background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
   border-radius: 15px;
-  padding: 20px 15px;
+  padding: 15px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  min-width: 200px;
+  min-width: auto;
   border: 2px solid #333;
-  gap: 20px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-/* Info section */
+/* Info section - full width on mobile */
 .info-section {
   width: 100%;
-  min-height: 60px;
+  min-height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-bottom: 1px solid #333;
-  padding-bottom: 12px;
+  padding-bottom: 10px;
+  margin-bottom: 5px;
+  order: 1;
 }
 
 .video-info-bar {
   color: #ff99cc;
-  font-size: 1.1rem;
+  font-size: 1rem;
   text-align: center;
-  padding: 8px;
+  padding: 6px;
   background: rgba(0,0,0,0.3);
   border-radius: 6px;
   width: 100%;
 }
 
-/* Button containers */
+/* Mobile: all buttons in one row */
 .top-buttons-row {
   display: flex;
-  justify-content: space-between;
-  gap: 15px;
-  width: 100%;
+  justify-content: center;
+  gap: 8px;
+  order: 2;
+  flex: 1;
 }
 
 .play-button-container {
   display: flex;
   justify-content: center;
-  width: 100%;
-  margin: 5px 0;
+  order: 3;
 }
 
 .upload-row {
-  width: 100%;
-  margin-top: 5px;
-  border-top: 1px solid #333;
-  padding-top: 15px;
+  order: 4;
+  width: auto;
+  border-top: none;
+  padding-top: 0;
 }
 
-/* Action buttons - consistent size */
+/* Action buttons - mobile size */
 .action-btn {
-  width: 95px;
-  height: 48px;
+  width: 80px;
+  height: 42px;
   border-radius: 30px;
   font-family: 'VT323', monospace;
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: bold;
   background: #222;
   border: 2px solid;
-  transition: transform 0.1s ease, background-color 0.1s ease;
+  transition: transform 0.1s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 4px;
   cursor: pointer;
   text-transform: uppercase;
 }
@@ -263,15 +266,15 @@ iframe {
 }
 
 .upload-full {
-  width: 100%;
-  height: 50px;
-  font-size: 1.3rem;
+  width: 80px;
+  height: 42px;
+  font-size: 1rem;
 }
 
-/* PLAY BUTTON - centered on its own */
+/* PLAY BUTTON - mobile size */
 .play-btn {
-  width: 130px;
-  height: 58px;
+  width: 100px;
+  height: 48px;
   border-radius: 40px;
   background: linear-gradient(145deg, #ffd966, #ffaa00);
   border: none;
@@ -279,10 +282,10 @@ iframe {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  gap: 6px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.5);
   transition: transform 0.1s ease;
-  padding: 0 15px;
+  padding: 0 12px;
 }
 
 .play-btn:active {
@@ -295,25 +298,65 @@ iframe {
 }
 
 .play-icon {
-  font-size: 2.2rem;
+  font-size: 1.8rem;
   color: #000;
 }
 
 .play-text {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: bold;
   color: #000;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   font-family: 'VT323', monospace;
 }
 
-/* Desktop optimization */
+/* DESKTOP - VERTICAL LAYOUT */
 @media (min-width: 1024px) {
   .side-panel {
+    flex-direction: column;
     min-width: 240px;
     padding: 25px 20px;
+    gap: 20px;
   }
   
+  .info-section {
+    order: 1;
+    min-height: 70px;
+    padding-bottom: 15px;
+    margin-bottom: 5px;
+  }
+  
+  .video-info-bar {
+    font-size: 1.2rem;
+    padding: 10px;
+  }
+  
+  /* Desktop: top row for ABOUT and INFO */
+  .top-buttons-row {
+    order: 2;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 15px;
+  }
+  
+  /* Desktop: PLAY centered on its own */
+  .play-button-container {
+    order: 3;
+    width: 100%;
+    margin: 10px 0;
+  }
+  
+  /* Desktop: UPLOAD full width at bottom */
+  .upload-row {
+    order: 4;
+    width: 100%;
+    border-top: 1px solid #333;
+    padding-top: 15px;
+    margin-top: 5px;
+  }
+  
+  /* Larger desktop buttons */
   .action-btn {
     width: 105px;
     height: 52px;
@@ -323,6 +366,7 @@ iframe {
   .play-btn {
     width: 145px;
     height: 62px;
+    margin: 0 auto;
   }
   
   .play-icon {
@@ -334,6 +378,7 @@ iframe {
   }
   
   .upload-full {
+    width: 100%;
     height: 55px;
     font-size: 1.4rem;
   }
@@ -469,70 +514,30 @@ input:focus {
   transform: scale(0.98);
 }
 
-/* MOBILE OPTIMIZED */
-@media (max-width: 768px) {
-  .tv-body { 
-    flex-direction: column; 
-  }
-  
-  .side-panel { 
-    width: 100%; 
-    min-width: auto;
-  }
-  
-  .top-buttons-row {
-    justify-content: space-around;
-  }
-  
-  .action-btn {
-    width: 85px;
-    height: 45px;
-    font-size: 1rem;
-  }
-  
-  .play-btn {
-    width: 110px;
-    height: 52px;
-  }
-  
-  .play-icon {
-    font-size: 1.8rem;
-  }
-  
-  .play-text {
-    font-size: 1.2rem;
-  }
-  
-  .tv-top { 
-    font-size: 1.2rem;
-    flex-direction: column; 
-    align-items: center; 
-    gap: 8px; 
-  }
-  
-  .now-playing { 
-    max-width: 100%;
-    font-size: 1rem;
-  }
-}
-
+/* Small mobile adjustments */
 @media (max-width: 480px) {
   .action-btn {
-    width: 75px;
-    height: 42px;
+    width: 70px;
+    height: 38px;
     font-size: 0.9rem;
   }
   
   .play-btn {
-    width: 100px;
-    height: 48px;
+    width: 90px;
+    height: 44px;
   }
   
   .play-icon {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
   }
   
   .play-text {
-    font-size: 1.1rem;
+    font-size: 1rem;
+  }
+  
+  .upload-full {
+    width: 70px;
+    height: 38px;
+    font-size: 0.9rem;
   }
 }
