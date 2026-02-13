@@ -19,36 +19,36 @@ const meta = document.getElementById('meta');
 const clickSfx = document.getElementById('sfxClick');
 const staticSfx = document.getElementById('sfxStatic');
 const humSfx = document.getElementById('sfxHum');
+const successSfx = document.getElementById('sfxSuccess');
 const videoInfoDisplay = document.getElementById('videoInfoDisplay');
 const nowPlayingTitle = document.getElementById('nowPlayingTitle');
+const submitBtn = document.getElementById('btnSend');
+const linkInput = document.getElementById('s_link');
+const nameInput = document.getElementById('s_name');
+const submitMessage = document.getElementById('submitMessage');
 
 // === AUDIO INIT (FIXED FOR MOBILE) ===
 function initAudio() {
     if (audioInitialized) return;
     
-    // Mobile browsers require user interaction to play audio
     const enableAudio = () => {
-        // Play hum at low volume
         if (humSfx) {
-            humSfx.volume = 0.12;
+            humSfx.volume = 0.1;
             humSfx.loop = true;
             humSfx.play().catch(e => console.log('Hum play failed:', e));
         }
         
-        // Preload click and static
         if (clickSfx) clickSfx.load();
         if (staticSfx) staticSfx.load();
+        if (successSfx) successSfx.load();
         
         audioInitialized = true;
         document.removeEventListener('click', enableAudio);
         document.removeEventListener('touchstart', enableAudio);
     };
     
-    // Wait for user interaction
     document.addEventListener('click', enableAudio);
     document.addEventListener('touchstart', enableAudio);
-    
-    // Try to play immediately if possible (desktop)
     enableAudio();
 }
 
@@ -61,9 +61,8 @@ function sfx() {
 }
 
 function osdMsg(text, duration = 3000) {
-    const originalText = meta.innerText;
-    meta.innerText = `>> ${text.toUpperCase()}`;
-    setTimeout(() => { meta.innerText = originalText; }, duration);
+    meta.innerText = `📺 ${text}`;
+    setTimeout(() => { meta.innerText = '📼 READY'; }, duration);
 }
 
 // Navigation
@@ -76,7 +75,8 @@ function showTV() {
 function showSubmit() { 
     sfx(); 
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.getElementById('submit').classList.add('active'); 
+    document.getElementById('submit').classList.add('active');
+    checkSubmitButton();
 }
 
 function toggleVideoInfo() {
@@ -94,6 +94,26 @@ function openInfo() {
 function closeInfo() { 
     sfx(); 
     document.getElementById('info').classList.remove('active'); 
+}
+
+// === VIDEO URL VALIDATION ===
+function isValidVideoUrl(url) {
+    if (!url || !url.includes('http')) return false;
+    
+    // Supported platforms
+    const patterns = [
+        'youtube.com',
+        'youtu.be',
+        'instagram.com',
+        'fb.watch',
+        'facebook.com',
+        'tiktok.com',
+        'vm.tiktok.com',
+        'dailymotion.com',
+        'vimeo.com'
+    ];
+    
+    return patterns.some(pattern => url.includes(pattern));
 }
 
 // === DATA HANDLING ===
@@ -115,18 +135,18 @@ async function loadVideos() {
         if (videos.length > 0) {
             playRandom();
         } else {
-            meta.innerText = "OSD: NO SIGNAL";
+            meta.innerText = "📺 NO VIDEOS YET";
         }
     } catch (e) {
         console.error("Signal fetch failed:", e);
-        osdMsg("TUNER ERROR");
+        osdMsg("LOAD ERROR");
     }
 }
 
 // Generate random start time (between 10 seconds and 5 minutes)
 function getRandomStartTime() {
     const minStart = 10;
-    const maxStart = 300; // 5 minutes
+    const maxStart = 300;
     return Math.floor(Math.random() * (maxStart - minStart + 1)) + minStart;
 }
 
@@ -140,23 +160,17 @@ function playRandom() {
         staticSfx.play().catch(e => console.log('Static play failed:', e));
     }
     
-    // Update displays
-    meta.innerText = `OSD: SOURCE [${selected.by.toUpperCase()}]`;
-    
     // Update video info
     videoInfoDisplay.innerHTML = `📼 UPLOADED BY: ${selected.by.toUpperCase()}`;
     nowPlayingTitle.innerHTML = `📡 ${selected.by.toUpperCase()}`;
     
     let videoId = extractID(selected.url);
-    
-    // Add random start time parameter
     const startTime = getRandomStartTime();
     
-    // YouTube Parameters with random start
     player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=0&rel=0&modestbranding=1&iv_load_policy=3&showinfo=0&enablejsapi=1&start=${startTime}`;
     player.style.opacity = 1;
     
-    console.log(`Playing video starting at ${startTime} seconds`);
+    osdMsg(`PLAYING: ${selected.by}`, 2000);
 }
 
 function extractID(url) {
@@ -165,31 +179,67 @@ function extractID(url) {
     return (match && match[2].length === 11) ? match[2] : url;
 }
 
+// === SUBMIT FORM HANDLING ===
+function checkSubmitButton() {
+    const linkVal = linkInput.value;
+    const isValid = isValidVideoUrl(linkVal);
+    
+    if (isValid) {
+        submitBtn.classList.add('active');
+        submitBtn.disabled = false;
+    } else {
+        submitBtn.classList.remove('active');
+        submitBtn.disabled = true;
+    }
+}
+
+function showThanksMessage() {
+    submitMessage.innerHTML = '✨ THANKS! VIDEO SENT ✨';
+    submitMessage.style.color = '#99ff99';
+    
+    setTimeout(() => {
+        submitMessage.innerHTML = '';
+    }, 3000);
+}
+
 function submitNostalgia() {
     sfx();
-    const linkVal = document.getElementById('s_link').value;
-    const nameVal = document.getElementById('s_name').value || 'Anonymous';
-
-    if(!linkVal.includes('http')) {
-        osdMsg("INVALID URL");
+    
+    const linkVal = linkInput.value;
+    const nameVal = nameInput.value.trim() || 'Nameless';
+    
+    if (!isValidVideoUrl(linkVal)) {
+        osdMsg("INVALID LINK");
+        submitMessage.innerHTML = '❌ INVALID VIDEO LINK';
+        submitMessage.style.color = '#ff6ec7';
+        setTimeout(() => { submitMessage.innerHTML = ''; }, 2000);
         return;
     }
 
-    // Fill the hidden form fields
+    // Fill hidden form fields
     document.getElementById('f_link').value = linkVal;
     document.getElementById('f_name').value = nameVal;
 
     // Submit to Google Form
     document.getElementById('submissionForm').submit();
 
-    osdMsg("📡 SIGNAL TRANSMITTED");
+    // Play success sound
+    if (successSfx && audioInitialized) {
+        successSfx.currentTime = 0;
+        successSfx.play().catch(e => console.log('Success sound failed:', e));
+    }
+
+    // Show thanks message
+    showThanksMessage();
     
-    // Clear form fields
-    document.getElementById('s_link').value = '';
-    document.getElementById('s_name').value = '';
+    // Clear form
+    linkInput.value = '';
+    nameInput.value = '';
+    checkSubmitButton();
     
+    // Return to TV after delay
     setTimeout(() => {
-        loadVideos(); // Refresh list to include new submission
+        loadVideos(); // Refresh list
         showTV();
     }, 2000);
 }
@@ -201,11 +251,13 @@ document.getElementById('btnInfo').onclick = openInfo;
 document.getElementById('btnSend').onclick = submitNostalgia;
 document.getElementById('btnShowName').onclick = toggleVideoInfo;
 
+// Form input validation
+linkInput.addEventListener('input', checkSubmitButton);
+nameInput.addEventListener('input', checkSubmitButton);
+
 // Initialize
 window.onload = () => {
     loadVideos();
     initAudio();
-    
-    // Additional mobile audio trigger
     document.body.addEventListener('touchstart', initAudio, { once: true });
 };
