@@ -542,3 +542,33 @@ input::placeholder {
     font-size: 1.2rem;
   }
 }
+
+/* Add to style.css */
+
+/* Disabled state for play button */
+.play-btn.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  filter: grayscale(0.5);
+}
+
+/* Hide meta display completely when info is off */
+.meta-display.hidden {
+  display: none;
+}
+
+/* About overlay close button fix */
+.overlay .glitch-btn {
+  cursor: pointer;
+  pointer-events: auto;
+  position: relative;
+  z-index: 200;
+}
+
+.overlay.active {
+  pointer-events: auto;
+}
+
+.overlay .retro-card {
+  pointer-events: auto;
+}
