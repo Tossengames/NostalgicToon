@@ -23,7 +23,7 @@
 <section id="tv" class="view active">
   <div class="tv-unit">
     <div class="tv-top">
-      <span class="model">NOSTALGIA-COLOR DELUXE</span>
+      <span class="model">NOSTALGIA-TV</span>
       <span class="now-playing" id="nowPlayingTitle"></span>
     </div>
     <div class="tv-body">
@@ -39,26 +39,25 @@
         <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
       </div>
       <div class="side-panel">
-        <div class="top-buttons">
-          <button id="btnInfo" class="about-btn">📻</button>
-          <button id="btnShowName" class="info-btn">📋</button>
+        <div class="button-row top-row">
+          <button id="btnInfo" class="action-btn about-btn">📻 ABOUT</button>
+          <button id="btnShowName" class="action-btn info-btn">📋 INFO</button>
         </div>
         
-        <div class="knob-container">
-            <button id="btnSwitch" class="knob">
-              <div class="knob-indicator"></div>
-              <span class="knob-icon">📺</span>
-            </button>
-            <label>CHANNEL</label>
+        <div class="button-row middle-row">
+          <button id="btnSwitch" class="play-btn">
+            <span class="play-icon">▶</span>
+            <span class="play-text">PLAY</span>
+          </button>
         </div>
         
-        <div class="bottom-buttons">
-          <button id="btnSubmit" class="submit-btn">📤</button>
+        <div class="button-row bottom-row">
+          <button id="btnSubmit" class="action-btn submit-btn">📤 UPLOAD</button>
         </div>
       </div>
     </div>
     <div class="meta-display">
-      <div class="osd" id="meta">VCR - PLAY</div>
+      <div class="osd" id="meta">📼 READY</div>
       <div id="videoInfoDisplay" class="video-info-bar" style="display: none;"></div>
     </div>
   </div>
@@ -66,33 +65,37 @@
 
 <section id="submit" class="view">
   <div class="retro-card">
-    <div class="terminal-header">📼 TRANSMIT SIGNAL</div>
+    <div class="terminal-header">📤 SHARE A VIDEO</div>
+    <p class="instruction-text">PASTE ANY VIDEO LINK (YouTube, Instagram, Facebook, TikTok)</p>
     <div class="field">
-        <label>YOUTUBE URL</label>
-        <input id="s_link" type="text" placeholder="PASTE LINK...">
+        <label>VIDEO LINK *</label>
+        <input id="s_link" type="text" placeholder="https://...">
     </div>
     <div class="field">
-        <label>SENDER NAME</label>
-        <input id="s_name" type="text" placeholder="YOUR HANDLE...">
+        <label>YOUR NAME (optional)</label>
+        <input id="s_name" type="text" placeholder="Anonymous">
     </div>
-    <button id="btnSend" class="glitch-btn">📡 BROADCAST NOW</button>
-    <button class="back-link" onclick="showTV()">[ CANCEL ]</button>
+    <button id="btnSend" class="glitch-btn" disabled>📡 SEND TO TV</button>
+    <div id="submitMessage" class="submit-message"></div>
+    <button class="back-link" onclick="showTV()">← BACK TO TV</button>
   </div>
 </section>
 
 <div id="info" class="overlay">
   <div class="retro-card">
     <div class="terminal-header">📺 NOSTALGIA TV</div>
-    <p style="color: #0f0; font-size: 1.2rem;">📼 COMMUNITY MEMORIES</p>
-    <p style="color: #ff99cc;">TURN THE KNOB → RANDOM VIBES</p>
-    <p style="color: #66ccff;">📤 SEND YOUR OWN</p>
-    <button class="glitch-btn" onclick="closeInfo()">EXIT</button>
+    <p style="color: #ff99cc; font-size: 1.3rem;">✨ COMMUNITY VIBES ✨</p>
+    <p style="color: #66ccff;">▶ CLICK PLAY FOR RANDOM VIDEO</p>
+    <p style="color: #99ff99;">📤 SHARE YOUR FAVORITES</p>
+    <p style="color: #ffd966;">📋 INFO TOGGLES VIDEO DETAILS</p>
+    <button class="glitch-btn" onclick="closeInfo()">CLOSE</button>
   </div>
 </div>
 
 <audio id="sfxClick" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_4b77a0a9d5.mp3" preload="auto"></audio>
 <audio id="sfxStatic" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_5c68b1c0b0.mp3" preload="auto"></audio>
 <audio id="sfxHum" src="https://cdn.pixabay.com/download/audio/2021/08/08/audio_9a93c0a6f7.mp3" loop preload="auto"></audio>
+<audio id="sfxSuccess" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_6a8c0a4d8f.mp3" preload="auto"></audio>
 
 <script src="app.js"></script>
 </body>
