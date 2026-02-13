@@ -22,7 +22,6 @@ body {
   position: relative;
 }
 
-/* Simplified backdrop - static but colorful */
 .tv-backdrop {
   position: fixed;
   inset: 0;
@@ -35,7 +34,6 @@ body {
 .view { display: none; width: 100%; justify-content: center; align-items: center; padding: 10px; }
 .view.active { display: flex; flex-direction: column; }
 
-/* TV UNIT - simplified glow */
 .tv-unit {
   background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
   border: 4px solid #333;
@@ -46,7 +44,6 @@ body {
   max-width: 900px;
 }
 
-/* Animated title - simplified */
 .tv-top { 
   font-size: 1.4rem; 
   margin-bottom: 15px; 
@@ -77,11 +74,16 @@ body {
   border: 1px solid #4d9eff;
 }
 
-.tv-body { display: flex; flex-direction: row; gap: 15px; }
+.tv-body { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 15px; 
+}
 
+/* Screen area - full width on mobile */
 .screen-area {
   position: relative;
-  flex: 3;
+  width: 100%;
   aspect-ratio: 4/3;
   background: #000;
   border: 12px solid #222;
@@ -90,7 +92,6 @@ body {
   box-shadow: inset 0 0 30px #000;
 }
 
-/* Simplified screen glow */
 .screen-glow {
   position: absolute;
   inset: 0;
@@ -100,7 +101,6 @@ body {
   pointer-events: none;
 }
 
-/* Blinking indicator lights - fewer animations */
 .indicator {
   position: absolute;
   width: 6px;
@@ -125,7 +125,6 @@ iframe {
   opacity: 1; 
 }
 
-/* Simplified noise effect */
 .noise { 
   position: absolute; 
   inset: 0; 
@@ -152,23 +151,18 @@ iframe {
   pointer-events: none; 
 }
 
-/* PANEL - MOBILE FIRST (ALL IN ONE ROW) */
+/* Panel - below screen on mobile */
 .side-panel {
-  flex: 1;
+  width: 100%;
   background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
   border-radius: 15px;
   padding: 15px;
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  min-width: auto;
+  flex-direction: column;
+  gap: 15px;
   border: 2px solid #333;
-  gap: 10px;
-  flex-wrap: wrap;
 }
 
-/* Info section - full width on mobile */
 .info-section {
   width: 100%;
   min-height: 50px;
@@ -177,8 +171,6 @@ iframe {
   justify-content: center;
   border-bottom: 1px solid #333;
   padding-bottom: 10px;
-  margin-bottom: 5px;
-  order: 1;
 }
 
 .video-info-bar {
@@ -189,47 +181,37 @@ iframe {
   background: rgba(0,0,0,0.3);
   border-radius: 6px;
   width: 100%;
+  display: none;
 }
 
-/* Mobile: all buttons in one row */
-.top-buttons-row {
+/* MOBILE: All buttons in one row below TV */
+.buttons-container {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
+  align-items: center;
   gap: 8px;
-  order: 2;
-  flex: 1;
+  width: 100%;
 }
 
-.play-button-container {
-  display: flex;
-  justify-content: center;
-  order: 3;
-}
-
-.upload-row {
-  order: 4;
-  width: auto;
-  border-top: none;
-  padding-top: 0;
-}
-
-/* Action buttons - mobile size */
 .action-btn {
-  width: 80px;
-  height: 42px;
+  min-width: 70px;
+  height: 40px;
+  padding: 0 8px;
   border-radius: 30px;
   font-family: 'VT323', monospace;
   font-size: 1rem;
   font-weight: bold;
   background: #222;
   border: 2px solid;
-  transition: transform 0.1s ease;
+  transition: all 0.1s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 3px;
   cursor: pointer;
   text-transform: uppercase;
+  flex: 0 1 auto;
 }
 
 .info-btn {
@@ -265,16 +247,10 @@ iframe {
   transform: scale(0.95);
 }
 
-.upload-full {
-  width: 80px;
-  height: 42px;
-  font-size: 1rem;
-}
-
-/* PLAY BUTTON - mobile size */
 .play-btn {
-  width: 100px;
-  height: 48px;
+  min-width: 90px;
+  height: 44px;
+  padding: 0 12px;
   border-radius: 40px;
   background: linear-gradient(145deg, #ffd966, #ffaa00);
   border: none;
@@ -282,10 +258,10 @@ iframe {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 5px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.5);
   transition: transform 0.1s ease;
-  padding: 0 12px;
+  flex: 0 1 auto;
 }
 
 .play-btn:active {
@@ -298,89 +274,69 @@ iframe {
 }
 
 .play-icon {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   color: #000;
 }
 
 .play-text {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: bold;
   color: #000;
   letter-spacing: 1px;
   font-family: 'VT323', monospace;
 }
 
-/* DESKTOP - VERTICAL LAYOUT */
+/* DESKTOP: Side panel with vertical buttons */
 @media (min-width: 1024px) {
+  .tv-body { 
+    flex-direction: row; 
+  }
+  
+  .screen-area {
+    width: auto;
+    flex: 3;
+  }
+  
   .side-panel {
-    flex-direction: column;
+    width: auto;
+    flex: 1;
     min-width: 240px;
-    padding: 25px 20px;
-    gap: 20px;
+    padding: 20px;
+  }
+  
+  .buttons-container {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .action-btn {
+    width: 100%;
+    height: 50px;
+    font-size: 1.3rem;
+    min-width: auto;
+  }
+  
+  .play-btn {
+    width: 100%;
+    height: 60px;
+    min-width: auto;
+    margin: 5px 0;
+  }
+  
+  .play-icon {
+    font-size: 2.2rem;
+  }
+  
+  .play-text {
+    font-size: 1.5rem;
   }
   
   .info-section {
-    order: 1;
     min-height: 70px;
-    padding-bottom: 15px;
-    margin-bottom: 5px;
   }
   
   .video-info-bar {
     font-size: 1.2rem;
-    padding: 10px;
-  }
-  
-  /* Desktop: top row for ABOUT and INFO */
-  .top-buttons-row {
-    order: 2;
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    gap: 15px;
-  }
-  
-  /* Desktop: PLAY centered on its own */
-  .play-button-container {
-    order: 3;
-    width: 100%;
-    margin: 10px 0;
-  }
-  
-  /* Desktop: UPLOAD full width at bottom */
-  .upload-row {
-    order: 4;
-    width: 100%;
-    border-top: 1px solid #333;
-    padding-top: 15px;
-    margin-top: 5px;
-  }
-  
-  /* Larger desktop buttons */
-  .action-btn {
-    width: 105px;
-    height: 52px;
-    font-size: 1.3rem;
-  }
-  
-  .play-btn {
-    width: 145px;
-    height: 62px;
-    margin: 0 auto;
-  }
-  
-  .play-icon {
-    font-size: 2.4rem;
-  }
-  
-  .play-text {
-    font-size: 1.6rem;
-  }
-  
-  .upload-full {
-    width: 100%;
-    height: 55px;
-    font-size: 1.4rem;
   }
 }
 
@@ -398,7 +354,7 @@ iframe {
   min-height: 30px;
 }
 
-/* OVERLAY & FORMS - FIXED BUTTONS */
+/* OVERLAY & FORMS */
 .overlay { 
   position: fixed; 
   inset: 0; 
@@ -457,7 +413,6 @@ input:focus {
   border-color: #ffd966; 
 }
 
-/* Fixed button styles - not greyed out */
 .glitch-btn { 
   width: 100%; 
   background: transparent; 
@@ -489,7 +444,6 @@ input:focus {
   color: #000;
 }
 
-/* Back link - fixed visibility */
 .back-link { 
   background: none; 
   border: none; 
@@ -517,27 +471,21 @@ input:focus {
 /* Small mobile adjustments */
 @media (max-width: 480px) {
   .action-btn {
-    width: 70px;
+    min-width: 65px;
     height: 38px;
     font-size: 0.9rem;
   }
   
   .play-btn {
-    width: 90px;
-    height: 44px;
+    min-width: 85px;
+    height: 42px;
   }
   
   .play-icon {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
   }
   
   .play-text {
     font-size: 1rem;
-  }
-  
-  .upload-full {
-    width: 70px;
-    height: 38px;
-    font-size: 0.9rem;
   }
 }
