@@ -1,6 +1,13 @@
 // === CONFIGURATION ===
 const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTYVsilo654qcbY8lRVyYDjIDyHHYFluy_2sVZmQWEBHbGfF6t3cpN9sC0kroL9izednFK0IwmJFbyg/pub?gid=314817228&single=true&output=csv';
 
+// Google Form Action URL for background submission
+const FORM_ACTION_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSebUTZIz5BC-l3I_iX9zguGN6XcoZ12ocZh6MvbWulyNCQ7ww/formResponse';
+
+// Entry IDs from your pre-filled link
+const ENTRY_LINK = 'entry.873128711';
+const ENTRY_NAME = 'entry.3875702';
+
 // === GLOBALS ===
 let videos = [];
 let showInfo = false;
@@ -116,6 +123,13 @@ async function loadVideos() {
     }
 }
 
+// Generate random start time (between 10 seconds and 5 minutes)
+function getRandomStartTime() {
+    const minStart = 10;
+    const maxStart = 300; // 5 minutes
+    return Math.floor(Math.random() * (maxStart - minStart + 1)) + minStart;
+}
+
 function playRandom() {
     if (videos.length === 0) return;
 
@@ -134,8 +148,15 @@ function playRandom() {
     nowPlayingTitle.innerHTML = `📡 ${selected.by.toUpperCase()}`;
     
     let videoId = extractID(selected.url);
-    player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=0&rel=0&modestbranding=1&iv_load_policy=3&showinfo=0&enablejsapi=1`;
+    
+    // Add random start time parameter
+    const startTime = getRandomStartTime();
+    
+    // YouTube Parameters with random start
+    player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=0&rel=0&modestbranding=1&iv_load_policy=3&showinfo=0&enablejsapi=1&start=${startTime}`;
     player.style.opacity = 1;
+    
+    console.log(`Playing video starting at ${startTime} seconds`);
 }
 
 function extractID(url) {
@@ -154,18 +175,21 @@ function submitNostalgia() {
         return;
     }
 
+    // Fill the hidden form fields
     document.getElementById('f_link').value = linkVal;
     document.getElementById('f_name').value = nameVal;
 
+    // Submit to Google Form
     document.getElementById('submissionForm').submit();
 
     osdMsg("📡 SIGNAL TRANSMITTED");
     
+    // Clear form fields
     document.getElementById('s_link').value = '';
     document.getElementById('s_name').value = '';
     
     setTimeout(() => {
-        loadVideos();
+        loadVideos(); // Refresh list to include new submission
         showTV();
     }, 2000);
 }
