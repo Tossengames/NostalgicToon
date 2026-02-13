@@ -18,7 +18,6 @@
       action="https://docs.google.com/forms/d/e/1FAIpQLSebUTZIz5BC-l3I_iX9zguGN6XcoZ12ocZh6MvbWulyNCQ7ww/formResponse">
     <input type="hidden" name="entry.873128711" id="f_link">
     <input type="hidden" name="entry.3875702" id="f_name">
-    <input type="hidden" name="entry.123456789" id="f_video_name">
 </form>
 
 <section id="tv" class="view active">
@@ -41,19 +40,22 @@
       </div>
       <div class="side-panel">
         <div class="knob-container">
-            <button id="btnSwitch" class="knob"><div class="knob-indicator"></div>🔄</button>
+            <button id="btnSwitch" class="knob">
+              <div class="knob-indicator"></div>
+              <span class="knob-icon">📺</span>
+            </button>
             <label>CHANNEL</label>
         </div>
         <div class="small-btns">
-            <button id="btnShowName">!</button>
-            <button id="btnInfo">ℹ️</button>
-            <button id="btnSubmit">📤</button>
+            <button id="btnShowName" class="info-btn">📋 INFO</button>
+            <button id="btnInfo" class="about-btn">📻 ABOUT</button>
+            <button id="btnSubmit" class="submit-btn">📤 UPLOAD</button>
         </div>
       </div>
     </div>
     <div class="meta-display">
       <div class="osd" id="meta">VCR - PLAY</div>
-      <div id="videoInfoDisplay" class="video-info-bar"></div>
+      <div id="videoInfoDisplay" class="video-info-bar" style="display: none;"></div>
     </div>
   </div>
 </section>
@@ -64,10 +66,6 @@
     <div class="field">
         <label>YOUTUBE URL</label>
         <input id="s_link" type="text" placeholder="PASTE LINK...">
-    </div>
-    <div class="field">
-        <label>VIDEO NAME</label>
-        <input id="s_video_name" type="text" placeholder="TITLE...">
     </div>
     <div class="field">
         <label>SENDER NAME</label>
@@ -88,9 +86,9 @@
   </div>
 </div>
 
-<audio id="sfxClick" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_4b77a0a9d5.mp3" loop="false"></audio>
-<audio id="sfxStatic" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_5c68b1c0b0.mp3" loop="false"></audio>
-<audio id="sfxHum" src="https://cdn.pixabay.com/download/audio/2021/08/08/audio_9a93c0a6f7.mp3" loop></audio>
+<audio id="sfxClick" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_4b77a0a9d5.mp3" preload="auto"></audio>
+<audio id="sfxStatic" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_5c68b1c0b0.mp3" preload="auto"></audio>
+<audio id="sfxHum" src="https://cdn.pixabay.com/download/audio/2021/08/08/audio_9a93c0a6f7.mp3" loop preload="auto"></audio>
 
 <script src="app.js"></script>
 </body>
