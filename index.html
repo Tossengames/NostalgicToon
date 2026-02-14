@@ -1,38 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Audio Test</title>
+  <meta charset="UTF-8">
+  <title>Audio Test</title>
 </head>
 <body>
+  <button id="btn">Make Sound</button>
 
-<button id="btn">CLICK ME</button>
+  <script>
+    const audio = new Audio('https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3');
+    audio.preload = 'auto';
 
-<audio id="sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_4b77a0a9d5.mp3"></audio>
-
-<script>
-let ctx;
-let unlocked = false;
-
-const btn = document.getElementById("btn");
-const audio = document.getElementById("sound");
-
-btn.onclick = () => {
-  // unlock audio context on first click
-  if (!unlocked) {
-    ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const src = ctx.createMediaElementSource(audio);
-    src.connect(ctx.destination);
-    unlocked = true;
-    console.log("audio unlocked");
-  }
-
-  audio.currentTime = 0;
-  audio.play()
-    .then(() => console.log("playing"))
-    .catch(e => console.error("play failed", e));
-};
-</script>
-
+    document.getElementById('btn').addEventListener('click', async () => {
+      try {
+        await audio.play();
+        console.log('Audio played!');
+      } catch (err) {
+        console.log('Play blocked:', err);
+      }
+    });
+  </script>
 </body>
 </html>
