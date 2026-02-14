@@ -3,115 +3,74 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sound Test</title>
+<title>Sound Test Fixed</title>
 <style>
-  body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    font-family: sans-serif;
-    background: #222;
-    color: #fff;
-  }
-  #btnClick {
-    font-size: 2rem;
-    padding: 30px 60px;
-    margin: 20px;
-    cursor: pointer;
-  }
-  #btnToggle {
-    font-size: 1.2rem;
-    padding: 15px 30px;
-    margin: 10px;
-    cursor: pointer;
-  }
-  #btnMP3 {
-    font-size: 1.2rem;
-    padding: 15px 30px;
-    margin: 10px;
-    cursor: pointer;
-  }
-  #feedback {
-    margin-top: 20px;
-    font-size: 1rem;
-    color: #0f0;
-  }
+  body { display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; background:#222; color:#fff; font-family:sans-serif; }
+  button { font-size:2rem; padding:30px 60px; margin:10px; cursor:pointer; }
+  #feedback { margin-top:20px; font-size:1rem; color:#0f0; }
 </style>
 </head>
 <body>
 
-<button id="btnClick">CLICK ME</button>
-<button id="btnToggle">Enable Sound 🔊</button>
+<button id="btnClick">CLICK ME (Programmatic)</button>
 <button id="btnMP3">Play MP3</button>
-
+<button id="btnEnable">Enable Sound 🔊</button>
 <div id="feedback">Feedback here...</div>
 
 <script>
 let audioEnabled = false;
 
-// Web Audio API setup
+// Web Audio setup
 const context = new (window.AudioContext || window.webkitAudioContext)();
-let mp3Audio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
-mp3Audio.crossOrigin = "anonymous";
+let mp3Audio = new Audio('sfx.mp3'); // <-- Put a real local mp3 file in the same folder
+mp3Audio.loop = false;
 
 const feedback = document.getElementById('feedback');
 
-function logFeedback(msg) {
+function log(msg) {
   feedback.textContent = msg;
   console.log(msg);
 }
 
-// Enable/disable audio
-document.getElementById('btnToggle').addEventListener('click', () => {
-  if (!audioEnabled) {
-    if (context.state === 'suspended') context.resume();
+// Enable sound
+document.getElementById('btnEnable').addEventListener('click', async () => {
+    if (context.state === 'suspended') {
+        await context.resume();
+    }
     audioEnabled = true;
-    document.getElementById('btnToggle').textContent = 'Disable Sound 🔇';
-    logFeedback('Audio Enabled');
-  } else {
-    audioEnabled = false;
-    document.getElementById('btnToggle').textContent = 'Enable Sound 🔊';
-    logFeedback('Audio Disabled');
-  }
+    log('Audio Enabled!');
 });
 
-// Programmatic sound
+// Programmatic oscillator
 document.getElementById('btnClick').addEventListener('click', () => {
-  if (!audioEnabled) {
-    logFeedback('Audio is disabled. Click "Enable Sound" first.');
-    return;
-  }
+    if (!audioEnabled) { log('Enable sound first!'); return; }
 
-  const oscillator = context.createOscillator();
-  oscillator.type = 'sine';
-  oscillator.frequency.setValueAtTime(440, context.currentTime);
+    const osc = context.createOscillator();
+    const gainNode = context.createGain();
+    gainNode.gain.value = 0.5;
 
-  const gainNode = context.createGain();
-  gainNode.gain.setValueAtTime(0.5, context.currentTime);
+    osc.connect(gainNode);
+    gainNode.connect(context.destination);
 
-  oscillator.connect(gainNode);
-  gainNode.connect(context.destination);
-  oscillator.start();
-  oscillator.stop(context.currentTime + 0.5);
+    osc.type = 'sine';
+    osc.frequency.value = 440;
 
-  logFeedback('Programmatic sound played!');
+    osc.start();
+    osc.stop(context.currentTime + 0.5);
+
+    log('Programmatic sound played!');
 });
 
-// MP3 sound
+// Play MP3
 document.getElementById('btnMP3').addEventListener('click', () => {
-  if (!audioEnabled) {
-    logFeedback('Audio is disabled. Click "Enable Sound" first.');
-    return;
-  }
+    if (!audioEnabled) { log('Enable sound first!'); return; }
 
-  mp3Audio.currentTime = 0;
-  mp3Audio.play().then(() => {
-    logFeedback('MP3 sound is playing!');
-  }).catch(err => {
-    logFeedback('MP3 failed: ' + err);
-  });
+    mp3Audio.currentTime = 0;
+    mp3Audio.play().then(() => {
+        log('MP3 sound playing!');
+    }).catch(err => {
+        log('MP3 failed: ' + err);
+    });
 });
 </script>
 
