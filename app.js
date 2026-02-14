@@ -10,6 +10,16 @@ let showInfo = false;
 let audioInitialized = false;
 let playCooldown = false;
 let stopTimeout = null;
+let audioContext = null;
+let humSource = null;
+let reverbNode = null;
+let pannerNode = null;
+let humGainNode = null;
+let settings = {
+    enable8D: true,
+    enableReverb: true,
+    humVolume: 15
+};
 
 // Elements
 const player = document.getElementById('player');
@@ -25,23 +35,138 @@ const nameInput = document.getElementById('s_name');
 const submitMessage = document.getElementById('submitMessage');
 const playBtn = document.getElementById('btnSwitch');
 
-// Simple audio init
-function initAudio() {
+// Settings elements
+const settings8D = document.getElementById('setting8D');
+const settingsReverb = document.getElementById('settingReverb');
+const humVolumeSlider = document.getElementById('humVolume');
+const humVolumeValue = document.getElementById('humVolumeValue');
+const testSoundBtn = document.getElementById('testSoundBtn');
+
+// === AUDIO INIT WITH EFFECTS ===
+async function initAudio() {
     if (audioInitialized) return;
     
-    const enableAudio = () => {
+    try {
+        // Create audio context
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Create nodes
+        pannerNode = audioContext.createStereoPanner();
+        reverbNode = audioContext.createConvolver();
+        humGainNode = audioContext.createGain();
+        
+        // Create reverb impulse
+        const reverbTime = 1.5;
+        const sampleRate = audioContext.sampleRate;
+        const length = sampleRate * reverbTime;
+        const impulse = audioContext.createBuffer(2, length, sampleRate);
+        
+        for (let channel = 0; channel < 2; channel++) {
+            const channelData = impulse.getChannelData(channel);
+            for (let i = 0; i < length; i++) {
+                const decay = Math.exp(-i / (sampleRate * 0.3));
+                channelData[i] = (Math.random() * 2 - 1) * decay;
+            }
+        }
+        reverbNode.buffer = impulse;
+        
+        // Setup hum with effects
         if (humSfx) {
-            humSfx.volume = 0.1;
+            humSfx.loop = true;
+            humSfx.volume = settings.humVolume / 100;
+            
+            // Connect through Web Audio API for effects
+            const track = audioContext.createMediaElementSource(humSfx);
+            
+            // Volume control
+            track.connect(humGainNode);
+            humGainNode.gain.value = settings.humVolume / 100;
+            
+            // Reverb (optional)
+            if (settings.enableReverb) {
+                humGainNode.connect(reverbNode);
+                reverbNode.connect(pannerNode);
+            } else {
+                humGainNode.connect(pannerNode);
+            }
+            
+            // 8D panning (optional)
+            pannerNode.connect(audioContext.destination);
+            
+            // Start hum
+            humSfx.play().catch(() => {});
+        }
+        
+        audioInitialized = true;
+        
+        // Start 8D animation if enabled
+        if (settings.enable8D) {
+            start8DEffect();
+        }
+        
+    } catch (e) {
+        console.log('Audio effects not supported, using fallback');
+        // Fallback to simple audio
+        if (humSfx) {
+            humSfx.volume = settings.humVolume / 100;
             humSfx.loop = true;
             humSfx.play().catch(() => {});
         }
         audioInitialized = true;
-    };
-    
-    document.addEventListener('click', enableAudio, { once: true });
-    document.addEventListener('touchstart', enableAudio, { once: true });
+    }
 }
 
+// 8D effect - pans sound left/right
+function start8DEffect() {
+    if (!pannerNode || !settings.enable8D) return;
+    
+    let time = 0;
+    function pan() {
+        if (!settings.enable8D) return;
+        time += 0.01;
+        const panValue = Math.sin(time * 0.8); // Slow pan
+        pannerNode.pan.setValueAtTime(panValue, audioContext.currentTime);
+        requestAnimationFrame(pan);
+    }
+    pan();
+}
+
+// Update audio settings
+function updateAudioSettings() {
+    settings.enable8D = settings8D.checked;
+    settings.enableReverb = settingsReverb.checked;
+    settings.humVolume = parseInt(humVolumeSlider.value);
+    humVolumeValue.textContent = settings.humVolume + '%';
+    
+    if (humGainNode) {
+        humGainNode.gain.value = settings.humVolume / 100;
+    }
+    
+    // Restart 8D if needed
+    if (settings.enable8D && audioContext) {
+        start8DEffect();
+    }
+}
+
+// Test sound
+function playTestSound() {
+    if (clickSfx && audioInitialized) {
+        clickSfx.currentTime = 0;
+        clickSfx.play().catch(() => {});
+    } else {
+        // Try to init audio first
+        initAudio().then(() => {
+            setTimeout(() => {
+                if (clickSfx) {
+                    clickSfx.currentTime = 0;
+                    clickSfx.play().catch(() => {});
+                }
+            }, 100);
+        });
+    }
+}
+
+// Simple sfx for buttons (uses regular audio element)
 function sfx() { 
     if (clickSfx && audioInitialized) { 
         clickSfx.currentTime = 0; 
@@ -76,6 +201,16 @@ function openInfo() {
 function closeInfo() { 
     sfx(); 
     document.getElementById('info').classList.remove('active'); 
+}
+
+function openSettings() {
+    sfx();
+    document.getElementById('settings').classList.add('active');
+}
+
+function closeSettings() {
+    sfx();
+    document.getElementById('settings').classList.remove('active');
 }
 
 // Platform detection
@@ -258,12 +393,35 @@ document.getElementById('btnSubmit').onclick = showSubmit;
 document.getElementById('btnInfo').onclick = openInfo;
 document.getElementById('btnSend').onclick = submitNostalgia;
 document.getElementById('btnShowName').onclick = toggleVideoInfo;
+document.getElementById('btnSettings').onclick = openSettings;
+window.closeSettings = closeSettings;
+
+// Settings events
+settings8D.addEventListener('change', updateAudioSettings);
+settingsReverb.addEventListener('change', updateAudioSettings);
+humVolumeSlider.addEventListener('input', updateAudioSettings);
+testSoundBtn.addEventListener('click', playTestSound);
+
+// Form input validation
 linkInput.addEventListener('input', checkSubmitButton);
 nameInput.addEventListener('input', checkSubmitButton);
+
+// First click anywhere initializes audio
+document.body.addEventListener('click', function initOnFirstClick() {
+    initAudio();
+    document.body.removeEventListener('click', initOnFirstClick);
+}, { once: true });
+
+document.body.addEventListener('touchstart', function initOnFirstTouch() {
+    initAudio();
+    document.body.removeEventListener('touchstart', initOnFirstTouch);
+}, { once: true });
 
 // Initialize
 window.onload = () => {
     videoInfoDisplay.style.display = 'none';
     loadVideos();
-    initAudio();
+    
+    // Try to init audio (may be blocked)
+    initAudio().catch(() => {});
 };
