@@ -1,144 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Nostalgia TV</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<title>Audio Test</title>
 </head>
 <body>
 
-<div class="tv-backdrop"></div>
+<button id="btn">CLICK ME</button>
 
-<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
-<form id="submissionForm" 
-      target="hidden_iframe" 
-      method="POST" 
-      action="https://docs.google.com/forms/d/e/1FAIpQLSebUTZIz5BC-l3I_iX9zguGN6XcoZ12ocZh6MvbWulyNCQ7ww/formResponse">
-    <input type="hidden" name="entry.873128711" id="f_link">
-    <input type="hidden" name="entry.3875702" id="f_name">
-</form>
+<audio id="sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_4b77a0a9d5.mp3"></audio>
 
-<section id="tv" class="view active">
-  <div class="tv-unit">
-    <div class="tv-top">
-      <span class="model animated-title">NOSTALGIA-TV</span>
-      <span class="now-playing" id="nowPlayingTitle"></span>
-    </div>
-    
-    <!-- Screen Area -->
-    <div class="screen-area">
-      <div class="screen-glow"></div>
-      <div class="indicator top-left"></div>
-      <div class="indicator top-right"></div>
-      <div class="indicator bottom-left"></div>
-      <div class="indicator bottom-right"></div>
-      <div class="glass-reflection"></div>
-      <div class="noise"></div>
-      <div class="scanlines"></div>
-      <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-    </div>
-    
-    <!-- Panel -->
-    <div class="panel">
-      <!-- Info Display -->
-      <div class="info-section">
-        <div id="videoInfoDisplay" class="video-info-bar"></div>
-      </div>
-      
-      <!-- Button Row -->
-      <div class="button-row">
-        <button id="btnInfo" class="action-btn about-btn">📻 ABOUT</button>
-        <button id="btnSwitch" class="play-btn">
-          <span class="play-icon">▶</span>
-          <span class="play-text">PLAY</span>
-        </button>
-        <button id="btnShowName" class="action-btn info-btn">📋 INFO</button>
-        <button id="btnSubmit" class="action-btn submit-btn">📤 UPLOAD</button>
-        <button id="btnSettings" class="action-btn settings-btn">⚙️ SET</button>
-      </div>
-    </div>
-  </div>
-</section>
+<script>
+let ctx;
+let unlocked = false;
 
-<section id="submit" class="view">
-  <div class="retro-card">
-    <div class="terminal-header">📤 SHARE A VIDEO</div>
-    <p class="instruction-text">PASTE ANY VIDEO LINK (YouTube, Vimeo, TikTok, Dailymotion)</p>
-    <div class="field">
-        <label>VIDEO LINK *</label>
-        <input id="s_link" type="text" placeholder="https://...">
-    </div>
-    <div class="field">
-        <label>YOUR NAME (optional)</label>
-        <input id="s_name" type="text" placeholder="Nameless">
-    </div>
-    <button id="btnSend" class="glitch-btn" disabled>📡 SEND TO TV</button>
-    <div id="submitMessage" class="submit-message"></div>
-    <button class="back-link" onclick="showTV()">← BACK TO TV</button>
-  </div>
-</section>
+const btn = document.getElementById("btn");
+const audio = document.getElementById("sound");
 
-<!-- Settings Panel -->
-<div id="settings" class="overlay">
-  <div class="retro-card settings-card">
-    <div class="terminal-header">⚙️ AUDIO SETTINGS</div>
-    
-    <div class="settings-group">
-      <div class="setting-item">
-        <label>🔊 8D EFFECT</label>
-        <div class="toggle-switch">
-          <input type="checkbox" id="setting8D" checked>
-          <span class="toggle-slider"></span>
-        </div>
-      </div>
-      
-      <div class="setting-item">
-        <label>🎵 REVERB</label>
-        <div class="toggle-switch">
-          <input type="checkbox" id="settingReverb" checked>
-          <span class="toggle-slider"></span>
-        </div>
-      </div>
-      
-      <div class="setting-item">
-        <label>📻 HUM VOLUME</label>
-        <input type="range" id="humVolume" min="0" max="100" value="15" class="volume-slider">
-        <span id="humVolumeValue" class="volume-value">15%</span>
-      </div>
-      
-      <div class="setting-item">
-        <label>🔊 TEST SOUND</label>
-        <button id="testSoundBtn" class="test-btn">PLAY TEST</button>
-      </div>
-    </div>
-    
-    <div class="settings-note">
-      ⚡ First click anywhere enables audio
-    </div>
-    
-    <button class="glitch-btn" onclick="closeSettings()">CLOSE</button>
-  </div>
-</div>
+btn.onclick = () => {
+  // unlock audio context on first click
+  if (!unlocked) {
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const src = ctx.createMediaElementSource(audio);
+    src.connect(ctx.destination);
+    unlocked = true;
+    console.log("audio unlocked");
+  }
 
-<div id="info" class="overlay">
-  <div class="retro-card">
-    <div class="terminal-header">📺 NOSTALGIA TV</div>
-    <p style="color: #ff99cc; font-size: 1.3rem;">✨ COMMUNITY VIBES ✨</p>
-    <p style="color: #66ccff;">▶ CLICK PLAY FOR RANDOM VIDEO</p>
-    <p style="color: #99ff99;">📤 SHARE YOUR FAVORITES</p>
-    <p style="color: #ffd966;">📋 INFO TOGGLES VIDEO DETAILS</p>
-    <p style="color: #ffaa00;">⚙️ SETTINGS FOR AUDIO EFFECTS</p>
-    <button class="glitch-btn" onclick="closeInfo()">CLOSE</button>
-  </div>
-</div>
+  audio.currentTime = 0;
+  audio.play()
+    .then(() => console.log("playing"))
+    .catch(e => console.error("play failed", e));
+};
+</script>
 
-<audio id="sfxClick" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_4b77a0a9d5.mp3" preload="auto"></audio>
-<audio id="sfxStatic" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_5c68b1c0b0.mp3" preload="auto"></audio>
-<audio id="sfxHum" src="https://cdn.pixabay.com/download/audio/2021/08/08/audio_9a93c0a6f7.mp3" loop preload="auto"></audio>
-<audio id="sfxSuccess" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_6a8c0a4d8f.mp3" preload="auto"></audio>
-
-<script src="app.js"></script>
 </body>
 </html>
