@@ -21,7 +21,7 @@ let settings = {
     humVolume: 15
 };
 
-// Elements
+// === ELEMENTS ===
 const player = document.getElementById('player');
 const clickSfx = document.getElementById('sfxClick');
 const staticSfx = document.getElementById('sfxStatic');
@@ -48,11 +48,13 @@ async function initAudio() {
 
     try {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        // Create nodes
         pannerNode = audioContext.createStereoPanner();
         reverbNode = audioContext.createConvolver();
         humGainNode = audioContext.createGain();
 
-        // Create reverb impulse
+        // Reverb impulse
         const reverbTime = 1.5;
         const sampleRate = audioContext.sampleRate;
         const length = sampleRate * reverbTime;
@@ -60,17 +62,17 @@ async function initAudio() {
         for (let channel = 0; channel < 2; channel++) {
             const channelData = impulse.getChannelData(channel);
             for (let i = 0; i < length; i++) {
-                const decay = Math.exp(-i / (sampleRate * 0.3));
-                channelData[i] = (Math.random() * 2 - 1) * decay;
+                channelData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (sampleRate * 0.3));
             }
         }
         reverbNode.buffer = impulse;
 
-        // Setup hum with effects
         if (humSfx) {
             humSfx.loop = true;
             humSfx.volume = settings.humVolume / 100;
+
             const track = audioContext.createMediaElementSource(humSfx);
+
             track.connect(humGainNode);
             humGainNode.gain.value = settings.humVolume / 100;
 
@@ -82,6 +84,8 @@ async function initAudio() {
             }
 
             pannerNode.connect(audioContext.destination);
+
+            // Start hum
             humSfx.play().catch(() => {});
         }
 
@@ -90,31 +94,30 @@ async function initAudio() {
         if (settings.enable8D) start8DEffect();
 
     } catch (e) {
-        console.log('Audio effects not supported, using fallback');
+        console.warn('Audio init failed, fallback to simple audio.');
         if (humSfx) {
-            humSfx.volume = settings.humVolume / 100;
             humSfx.loop = true;
+            humSfx.volume = settings.humVolume / 100;
             humSfx.play().catch(() => {});
         }
         audioInitialized = true;
     }
 }
 
-// 8D effect - pans sound left/right
+// 8D PAN EFFECT
 function start8DEffect() {
     if (!pannerNode || !settings.enable8D) return;
     let time = 0;
     function pan() {
         if (!settings.enable8D) return;
         time += 0.01;
-        const panValue = Math.sin(time * 0.8);
-        pannerNode.pan.setValueAtTime(panValue, audioContext.currentTime);
+        pannerNode.pan.setValueAtTime(Math.sin(time * 0.8), audioContext.currentTime);
         requestAnimationFrame(pan);
     }
     pan();
 }
 
-// Update audio settings
+// UPDATE AUDIO SETTINGS
 function updateAudioSettings() {
     settings.enable8D = settings8D.checked;
     settings.enableReverb = settingsReverb.checked;
@@ -124,24 +127,17 @@ function updateAudioSettings() {
     if (settings.enable8D && audioContext) start8DEffect();
 }
 
-// Test sound
+// PLAY TEST SOUND
 function playTestSound() {
-    if (clickSfx && audioInitialized) {
-        clickSfx.currentTime = 0;
-        clickSfx.play().catch(() => {});
-    } else {
-        initAudio().then(() => {
-            setTimeout(() => {
-                if (clickSfx) {
-                    clickSfx.currentTime = 0;
-                    clickSfx.play().catch(() => {});
-                }
-            }, 100);
-        });
-    }
+    initAudio().then(() => {
+        if (clickSfx) {
+            clickSfx.currentTime = 0;
+            clickSfx.play().catch(() => {});
+        }
+    });
 }
 
-// Simple sfx for buttons
+// SIMPLE BUTTON SFX
 function sfx() {
     if (clickSfx && audioInitialized) {
         clickSfx.currentTime = 0;
@@ -149,7 +145,7 @@ function sfx() {
     }
 }
 
-// === VIEW NAVIGATION ===
+// === VIEW SWITCHING ===
 function showTV() {
     sfx();
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -174,13 +170,13 @@ function closeInfo() { sfx(); document.getElementById('info').classList.remove('
 function openSettings() { sfx(); document.getElementById('settings').classList.add('active'); }
 function closeSettings() { sfx(); document.getElementById('settings').classList.remove('active'); }
 
-// === VIDEO HANDLING ===
+// === VIDEO EMBEDDING ===
 function getPlatformFromUrl(url) {
     if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube';
     if (url.includes('vimeo.com')) return 'vimeo';
     if (url.includes('tiktok.com')) return 'tiktok';
     if (url.includes('dailymotion.com') || url.includes('dai.ly')) return 'dailymotion';
-    if (url.includes('.mp4') || url.includes('.webm') || url.includes('.mov')) return 'direct';
+    if (url.match(/\.(mp4|webm|mov)$/)) return 'direct';
     return 'unknown';
 }
 
@@ -217,6 +213,7 @@ function getEmbedUrl(videoUrl, startTime = 0) {
     }
 }
 
+// === VIDEO PLAYBACK ===
 function estimateVideoDuration(url) {
     const platform = getPlatformFromUrl(url);
     if (platform === 'tiktok') return 30;
@@ -246,6 +243,7 @@ function stopVideoAfterDelay(duration) {
 
 function playRandom() {
     if (playCooldown || videos.length === 0) return;
+
     playCooldown = true;
     playBtn.classList.add('disabled');
     setTimeout(() => { playCooldown = false; playBtn.classList.remove('disabled'); }, 500);
@@ -253,7 +251,11 @@ function playRandom() {
     sfx();
 
     const selected = videos[Math.floor(Math.random() * videos.length)];
-    if (staticSfx && audioInitialized) { staticSfx.currentTime = 0; staticSfx.play().catch(() => {}); }
+
+    if (staticSfx && audioInitialized) {
+        staticSfx.currentTime = 0;
+        staticSfx.play().catch(() => {});
+    }
 
     videoInfoDisplay.innerHTML = `📼 ${selected.by.toUpperCase()}`;
     nowPlayingTitle.innerHTML = `📡 ${selected.by.toUpperCase()}`;
@@ -268,50 +270,55 @@ function playRandom() {
     }
 }
 
-// === VIDEO LOAD FROM SHEET ===
+// === LOAD VIDEOS ===
 async function loadVideos() {
     try {
         const response = await fetch(`${SHEET_CSV_URL}&cachebust=${Date.now()}`);
         const data = await response.text();
-        videos = data.split('\n').map(line => {
+        videos = data.split('\n').slice(1).map(line => {
             const [url, by] = line.split(',');
-            return { url: url.trim(), by: by ? by.trim() : 'Anonymous' };
-        });
-        console.log('Videos loaded:', videos.length);
-    } catch (err) { console.error('Error loading videos:', err); }
+            return { url: url.trim(), by: (by || 'Unknown').trim() };
+        }).filter(v => v.url);
+    } catch(e) {
+        console.error('Failed to load videos:', e);
+    }
 }
 
-// === FORM SUBMISSION ===
+// === SUBMIT FORM ===
+function checkSubmitButton() {
+    submitBtn.disabled = !linkInput.value.trim();
+}
+
+linkInput.addEventListener('input', checkSubmitButton);
+
 submitBtn.addEventListener('click', () => {
-    const videoLink = linkInput.value.trim();
-    const name = nameInput.value.trim() || 'Nameless';
-    if (!videoLink) {
-        submitMessage.textContent = '❌ Please enter a video link.';
-        return;
-    }
-
-    document.getElementById('f_link').value = videoLink;
+    const link = linkInput.value.trim();
+    const name = nameInput.value.trim();
+    if (!link) return;
+    document.getElementById('f_link').value = link;
     document.getElementById('f_name').value = name;
-
-    submitMessage.textContent = '📤 Sending...';
     document.getElementById('submissionForm').submit();
-
-    setTimeout(() => {
-        submitMessage.textContent = '✅ Video submitted! Thank you.';
-        linkInput.value = '';
-        nameInput.value = '';
-    }, 1500);
+    submitMessage.textContent = '✅ Video sent!';
+    linkInput.value = '';
+    nameInput.value = '';
+    checkSubmitButton();
+    sfx();
 });
 
-// === INIT ON LOAD ===
-window.addEventListener('load', () => {
-    loadVideos();
-    updateAudioSettings();
-});
-
-// === SETTINGS EVENTS ===
+// === SETTINGS ===
 settings8D.addEventListener('change', updateAudioSettings);
 settingsReverb.addEventListener('change', updateAudioSettings);
 humVolumeSlider.addEventListener('input', updateAudioSettings);
 testSoundBtn.addEventListener('click', playTestSound);
-playBtn.addEventListener('click', () => { initAudio().then(playRandom); });
+
+// === PLAY BUTTON ===
+playBtn.addEventListener('click', () => {
+    initAudio().then(() => playRandom());
+});
+
+// === INITIALIZE ===
+document.addEventListener('click', () => {
+    if (!audioInitialized) initAudio();
+}, { once: true });
+
+loadVideos();
