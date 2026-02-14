@@ -27,7 +27,7 @@
       <span class="now-playing" id="nowPlayingTitle"></span>
     </div>
     
-    <!-- Screen Area - Top on mobile, Left on PC -->
+    <!-- Screen Area -->
     <div class="screen-area">
       <div class="screen-glow"></div>
       <div class="indicator top-left"></div>
@@ -40,14 +40,14 @@
       <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
     </div>
     
-    <!-- Panel - Below screen on mobile, Right side on PC -->
+    <!-- Panel -->
     <div class="panel">
       <!-- Info Display -->
       <div class="info-section">
         <div id="videoInfoDisplay" class="video-info-bar"></div>
       </div>
       
-      <!-- All buttons in one row on mobile, vertical on PC -->
+      <!-- Button Row -->
       <div class="button-row">
         <button id="btnInfo" class="action-btn about-btn">📻 ABOUT</button>
         <button id="btnSwitch" class="play-btn">
@@ -56,6 +56,7 @@
         </button>
         <button id="btnShowName" class="action-btn info-btn">📋 INFO</button>
         <button id="btnSubmit" class="action-btn submit-btn">📤 UPLOAD</button>
+        <button id="btnSettings" class="action-btn settings-btn">⚙️ SET</button>
       </div>
     </div>
   </div>
@@ -79,6 +80,48 @@
   </div>
 </section>
 
+<!-- Settings Panel -->
+<div id="settings" class="overlay">
+  <div class="retro-card settings-card">
+    <div class="terminal-header">⚙️ AUDIO SETTINGS</div>
+    
+    <div class="settings-group">
+      <div class="setting-item">
+        <label>🔊 8D EFFECT</label>
+        <div class="toggle-switch">
+          <input type="checkbox" id="setting8D" checked>
+          <span class="toggle-slider"></span>
+        </div>
+      </div>
+      
+      <div class="setting-item">
+        <label>🎵 REVERB</label>
+        <div class="toggle-switch">
+          <input type="checkbox" id="settingReverb" checked>
+          <span class="toggle-slider"></span>
+        </div>
+      </div>
+      
+      <div class="setting-item">
+        <label>📻 HUM VOLUME</label>
+        <input type="range" id="humVolume" min="0" max="100" value="15" class="volume-slider">
+        <span id="humVolumeValue" class="volume-value">15%</span>
+      </div>
+      
+      <div class="setting-item">
+        <label>🔊 TEST SOUND</label>
+        <button id="testSoundBtn" class="test-btn">PLAY TEST</button>
+      </div>
+    </div>
+    
+    <div class="settings-note">
+      ⚡ First click anywhere enables audio
+    </div>
+    
+    <button class="glitch-btn" onclick="closeSettings()">CLOSE</button>
+  </div>
+</div>
+
 <div id="info" class="overlay">
   <div class="retro-card">
     <div class="terminal-header">📺 NOSTALGIA TV</div>
@@ -86,6 +129,7 @@
     <p style="color: #66ccff;">▶ CLICK PLAY FOR RANDOM VIDEO</p>
     <p style="color: #99ff99;">📤 SHARE YOUR FAVORITES</p>
     <p style="color: #ffd966;">📋 INFO TOGGLES VIDEO DETAILS</p>
+    <p style="color: #ffaa00;">⚙️ SETTINGS FOR AUDIO EFFECTS</p>
     <button class="glitch-btn" onclick="closeInfo()">CLOSE</button>
   </div>
 </div>
