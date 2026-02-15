@@ -1,8 +1,5 @@
 // === CONFIGURATION ===
 const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTYVsilo654qcbY8lRVyYDjIDyHHYFluy_2sVZmQWEBHbGfF6t3cpN9sC0kroL9izednFK0IwmJFbyg/pub?gid=314817228&single=true&output=csv';
-const FORM_ACTION_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSebUTZIz5BC-l3I_iX9zguGN6XcoZ12ocZh6MvbWulyNCQ7ww/formResponse';
-const ENTRY_LINK = 'entry.873128711';
-const ENTRY_NAME = 'entry.3875702';
 
 // === GLOBALS ===
 let videos = [];
@@ -11,9 +8,6 @@ let audioInitialized = false;
 let playCooldown = false;
 let stopTimeout = null;
 let humPlaying = false;
-let settings = {
-    humVolume: 15
-};
 
 // Elements
 const player = document.getElementById('player');
@@ -29,48 +23,33 @@ const nameInput = document.getElementById('s_name');
 const submitMessage = document.getElementById('submitMessage');
 const playBtn = document.getElementById('btnSwitch');
 
-// Settings elements
-const settings8D = document.getElementById('setting8D');
-const settingsReverb = document.getElementById('settingReverb');
-const humVolumeSlider = document.getElementById('humVolume');
-const humVolumeValue = document.getElementById('humVolumeValue');
-const testSoundBtn = document.getElementById('testSoundBtn');
-
 // === SIMPLE AUDIO INIT (Works on all browsers) ===
-async function initAudio() {
+function initAudio() {
     if (audioInitialized) return;
     
-    try {
-        console.log('Initializing audio...');
+    console.log('Initializing audio...');
+    
+    // Set initial volume for all audio elements
+    if (clickSfx) clickSfx.volume = 0.7;
+    if (staticSfx) staticSfx.volume = 0.5;
+    if (successSfx) successSfx.volume = 0.8;
+    
+    // Set up hum sound
+    if (humSfx) {
+        humSfx.loop = true;
+        humSfx.volume = 0.15; // 15% volume
         
-        // Set initial volume for all audio elements
-        if (clickSfx) clickSfx.volume = 0.7;
-        if (staticSfx) staticSfx.volume = 0.5;
-        if (successSfx) successSfx.volume = 0.8;
-        
-        // Set up hum sound
-        if (humSfx) {
-            humSfx.loop = true;
-            humSfx.volume = settings.humVolume / 100;
-            
-            // Try to play hum (browsers might block this, but we'll try)
-            try {
-                await humSfx.play();
-                humPlaying = true;
-                console.log('Hum started');
-            } catch (e) {
-                console.log('Hum play blocked - will start on next interaction');
-            }
-        }
-        
-        audioInitialized = true;
-        console.log('Audio initialized successfully');
-        
-    } catch (e) {
-        console.log('Audio init error:', e);
-        // Still mark as initialized so we don't keep trying
-        audioInitialized = true;
+        // Try to play hum (browsers might block this, but we'll try)
+        humSfx.play().then(() => {
+            humPlaying = true;
+            console.log('Hum started');
+        }).catch(e => {
+            console.log('Hum play blocked - will start on next interaction');
+        });
     }
+    
+    audioInitialized = true;
+    console.log('Audio initialized');
 }
 
 // Play hum sound (call this after user interaction)
@@ -78,60 +57,32 @@ function playHum() {
     if (!humSfx || humPlaying) return;
     
     if (!audioInitialized) {
-        initAudio().then(() => {
-            if (humSfx && !humPlaying) {
-                humSfx.play().catch(() => {});
-                humPlaying = true;
-            }
-        });
+        initAudio();
+        setTimeout(() => {
+            humSfx.play().catch(() => {});
+            humPlaying = true;
+        }, 100);
     } else {
         humSfx.play().catch(() => {});
         humPlaying = true;
     }
 }
 
-// Simple sfx for buttons (works everywhere)
+// Simple sfx for buttons
 function sfx() {
     if (!clickSfx) return;
     
     if (!audioInitialized) {
-        // Try to initialize audio on first click
-        initAudio().then(() => {
+        initAudio();
+        setTimeout(() => {
             clickSfx.currentTime = 0;
             clickSfx.play().catch(e => console.log('sfx error:', e));
-            playHum(); // Also try to start hum
-        });
+            playHum();
+        }, 100);
     } else {
         clickSfx.currentTime = 0;
         clickSfx.play().catch(e => console.log('sfx error:', e));
-        playHum(); // Ensure hum is playing
-    }
-}
-
-// Test sound function
-function playTestSound() {
-    if (!clickSfx) return;
-    
-    if (!audioInitialized) {
-        initAudio().then(() => {
-            clickSfx.currentTime = 0;
-            clickSfx.play().catch(() => {});
-            playHum();
-        });
-    } else {
-        clickSfx.currentTime = 0;
-        clickSfx.play().catch(() => {});
         playHum();
-    }
-}
-
-// Update hum volume
-function updateHumVolume() {
-    settings.humVolume = parseInt(humVolumeSlider.value);
-    humVolumeValue.textContent = settings.humVolume + '%';
-    
-    if (humSfx) {
-        humSfx.volume = settings.humVolume / 100;
     }
 }
 
@@ -163,16 +114,6 @@ function openInfo() {
 function closeInfo() { 
     sfx(); 
     document.getElementById('info').classList.remove('active'); 
-}
-
-function openSettings() {
-    sfx();
-    document.getElementById('settings').classList.add('active');
-}
-
-function closeSettings() {
-    sfx();
-    document.getElementById('settings').classList.remove('active');
 }
 
 // === VIDEO FUNCTIONS ===
@@ -301,7 +242,7 @@ async function loadVideos() {
 
         if (videos.length > 0) playRandom();
     } catch (e) {
-        console.log('Video load error');
+        console.log('Video load error:', e);
     }
 }
 
@@ -312,8 +253,13 @@ function isValidVideoUrl(url) {
 }
 
 function checkSubmitButton() {
-    submitBtn.classList.toggle('active', isValidVideoUrl(linkInput.value));
-    submitBtn.disabled = !isValidVideoUrl(linkInput.value);
+    const isValid = isValidVideoUrl(linkInput.value);
+    submitBtn.disabled = !isValid;
+    if (isValid) {
+        submitBtn.classList.add('active');
+    } else {
+        submitBtn.classList.remove('active');
+    }
 }
 
 function submitNostalgia() {
@@ -355,18 +301,8 @@ document.getElementById('btnSubmit').onclick = showSubmit;
 document.getElementById('btnInfo').onclick = openInfo;
 document.getElementById('btnSend').onclick = submitNostalgia;
 document.getElementById('btnShowName').onclick = toggleVideoInfo;
-document.getElementById('btnSettings').onclick = openSettings;
-window.closeSettings = closeSettings;
-window.showTV = showTV;
 window.closeInfo = closeInfo;
-
-// Settings events
-humVolumeSlider.addEventListener('input', updateHumVolume);
-testSoundBtn.addEventListener('click', playTestSound);
-
-// These toggles just update UI - effects not actually applied
-settings8D.addEventListener('change', () => sfx());
-settingsReverb.addEventListener('change', () => sfx());
+window.showTV = showTV;
 
 // Form input validation
 linkInput.addEventListener('input', checkSubmitButton);
@@ -387,7 +323,4 @@ document.body.addEventListener('touchstart', function initOnFirstTouch() {
 window.onload = () => {
     videoInfoDisplay.style.display = 'none';
     loadVideos();
-    
-    // Try to init audio (may be blocked)
-    initAudio().catch(() => {});
 };
