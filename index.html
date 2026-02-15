@@ -9,7 +9,10 @@
 </head>
 <body>
 
-<div class="tv-backdrop"></div>
+<!-- Background elements -->
+<div class="tv-backdrop" id="tv-backdrop"></div>
+<div class="bloom-overlay"></div>
+<div class="grain-overlay"></div>
 
 <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
 <form id="submissionForm" 
@@ -21,10 +24,9 @@
 </form>
 
 <section id="tv" class="view active">
-  <div class="tv-unit">
+  <div class="tv-unit" id="tv-unit">
     <div class="tv-top">
       <span class="model animated-title">تلفاز الذكريات</span>
-      <!-- Removed nowPlayingTitle span -->
     </div>
     
     <!-- Screen Area -->
@@ -41,7 +43,7 @@
     </div>
     
     <!-- Panel -->
-    <div class="panel">
+    <div class="panel" id="tv-panel">
       <!-- Info Display -->
       <div class="info-section">
         <div id="videoInfoDisplay" class="video-info-bar"></div>
@@ -49,7 +51,7 @@
       
       <!-- Button Row -->
       <div class="button-row">
-        <button id="btnInfo" class="action-btn about-btn">؟</button>
+        <button id="btnInfo" class="action-btn about-btn">؟ ما هذا</button>
         <button id="btnSwitch" class="play-btn">
           <span class="play-icon">▶</span>
           <span class="play-text">تشغيل</span>
@@ -86,34 +88,38 @@
   <div class="retro-card">
     <div class="terminal-header">📺 تلفاز الذكريات</div>
 
-    <!-- New poetic text added here -->
-    <p style="color:#ff99cc; font-size:1.4rem; line-height:1.6; margin-bottom:25px;">
+    <!-- Poetic text -->
+    <p style="color:#ff99cc; font-size:1.4rem; line-height:1.8; margin-bottom:25px; text-shadow:0 0 10px #ff99cc;">
       آلة زمن لذكريات الطفولة.<br>
       تشغّل التلفاز، وتعود لحظة.<br>
       وإن كانت لديك ذكرى… أضفها.
     </p>
 
-    <p style="color:#66ccff;">
+    <p style="color:#66ccff; margin:10px 0; text-shadow:0 0 5px #66ccff;">
       ▶ اضغط تشغيل لمقطع عشوائي من الماضي
     </p>
 
-    <p style="color:#99ff99;">
+    <p style="color:#99ff99; margin:10px 0; text-shadow:0 0 5px #99ff99;">
       ＋ أضف ذكرياتك وساهم في بناء الأرشيف
     </p>
 
-    <p style="color:#ffd966;">
+    <p style="color:#ffd966; margin:10px 0; text-shadow:0 0 5px #ffd966;">
       ! لإظهار أو إخفاء اسم المقطع
     </p>
 
+    <p style="color:#ffaa00; margin:10px 0 20px; text-shadow:0 0 5px #ffaa00;">
+      ⚡ اضغط في أي مكان لتفعيل الصوت
+    </p>
 
     <button class="glitch-btn" onclick="closeInfo()">إغلاق</button>
   </div>
 </div>
 
-<audio id="sfxClick" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_4b77a0a9d5.mp3" preload="auto"></audio>
-<audio id="sfxStatic" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_5c68b1c0b0.mp3" preload="auto"></audio>
-<audio id="sfxHum" src="https://cdn.pixabay.com/download/audio/2021/08/08/audio_9a93c0a6f7.mp3" loop preload="auto"></audio>
-<audio id="sfxSuccess" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_6a8c0a4d8f.mp3" preload="auto"></audio>
+<!-- Audio elements with fallback data URIs -->
+<audio id="sfxClick" preload="auto"></audio>
+<audio id="sfxStatic" preload="auto"></audio>
+<audio id="sfxHum" loop preload="auto"></audio>
+<audio id="sfxSuccess" preload="auto"></audio>
 
 <script src="app.js"></script>
 </body>
