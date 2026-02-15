@@ -290,52 +290,75 @@ function generateSuccessSound() {
 
 // === AUDIO INIT WITH FALLBACK ===
 async function initAudio() {
-  if (audioInitialized) return;
-  
-  console.log('Initializing audio...');
-  
-  // Try to load external MP3s first
-  const mp3Sources = {
-    click: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_4b77a0a9d5.mp3',
-    static: 'https://cdn.pixabay.com/download/audio/2021/08/04/audio_5c68b1c0b0.mp3',
-    hum: 'https://cdn.pixabay.com/download/audio/2021/08/08/audio_9a93c0a6f7.mp3',
-    success: 'https://cdn.pixabay.com/download/audio/2021/08/04/audio_6a8c0a4d8f.mp3'
-  };
-  
-  // Try to load each MP3
-  try {
-    clickSfx.src = mp3Sources.click;
-    await clickSfx.load();
-    // Test if it can play
-    clickSfx.play().catch(() => {}).then(() => {
-      clickSfx.pause();
-      clickSfx.currentTime = 0;
-    });
-    console.log('MP3 sounds loaded successfully');
-    useProgrammaticSound = false;
-  } catch (e) {
-    console.log('MP3 loading failed, using programmatic sound');
-    useProgrammaticSound = true;
-    initProgrammaticSound();
-  }
-  
-  // Set up hum
-  if (!useProgrammaticSound && humSfx) {
-    humSfx.loop = true;
-    humSfx.volume = 0.15;
+    if (audioInitialized) return;
+    
+    console.log('Initializing audio...');
+    
+    // Set initial volume for all audio elements
+    if (clickSfx) clickSfx.volume = 0.7;
+    if (staticSfx) staticSfx.volume = 0.5;
+    if (successSfx) successSfx.volume = 0.8;
+    
+    // Try to load external MP3s first
+    const mp3Sources = {
+        click: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_4b77a0a9d5.mp3',
+        static: 'https://cdn.pixabay.com/download/audio/2021/08/04/audio_5c68b1c0b0.mp3',
+        hum: 'https://cdn.pixabay.com/download/audio/2021/08/08/audio_9a93c0a6f7.mp3',
+        success: 'https://cdn.pixabay.com/download/audio/2021/08/04/audio_6a8c0a4d8f.mp3'
+    };
+    
+    // Set sources
+    if (clickSfx) clickSfx.src = mp3Sources.click;
+    if (staticSfx) staticSfx.src = mp3Sources.static;
+    if (humSfx) humSfx.src = mp3Sources.hum;
+    if (successSfx) successSfx.src = mp3Sources.success;
+    
+    // Load all audio
     try {
-      await humSfx.play();
-      humPlaying = true;
-      console.log('Hum started');
+        if (clickSfx) await clickSfx.load();
+        if (staticSfx) await staticSfx.load();
+        if (humSfx) await humSfx.load();
+        if (successSfx) await successSfx.load();
+        
+        // Test if click sound works
+        if (clickSfx) {
+            const playTest = clickSfx.play();
+            if (playTest !== undefined) {
+                playTest.then(() => {
+                    clickSfx.pause();
+                    clickSfx.currentTime = 0;
+                    console.log('MP3 sounds loaded successfully');
+                    useProgrammaticSound = false;
+                }).catch(e => {
+                    console.log('MP3 play failed, using programmatic sound:', e);
+                    useProgrammaticSound = true;
+                    initProgrammaticSound();
+                });
+            }
+        }
     } catch (e) {
-      console.log('Hum play blocked');
+        console.log('MP3 loading failed, using programmatic sound');
+        useProgrammaticSound = true;
+        initProgrammaticSound();
     }
-  } else if (useProgrammaticSound) {
-    playProgrammaticHum();
-  }
-  
-  audioInitialized = true;
-  console.log('Audio initialized, using', useProgrammaticSound ? 'programmatic' : 'MP3', 'sounds');
+    
+    // Set up hum
+    if (!useProgrammaticSound && humSfx) {
+        humSfx.loop = true;
+        humSfx.volume = 0.15;
+        try {
+            await humSfx.play();
+            humPlaying = true;
+            console.log('Hum started');
+        } catch (e) {
+            console.log('Hum play blocked');
+        }
+    } else if (useProgrammaticSound) {
+        playProgrammaticHum();
+    }
+    
+    audioInitialized = true;
+    console.log('Audio initialized, using', useProgrammaticSound ? 'programmatic' : 'MP3', 'sounds');
 }
 
 // Play hum
@@ -362,30 +385,32 @@ function playHum() {
   }
 }
 
-// Main sound function
+// Main sound function - FIXED to actually play sound!
 function sfx(event) {
   // Create ripple effect
   if (event) {
     createRipple(event);
   }
   
+  // Play click sound immediately
   if (!audioInitialized) {
-    initAudio();
-    setTimeout(() => {
+    // Initialize audio first, then play
+    initAudio().then(() => {
       if (useProgrammaticSound) {
         playProgrammaticClick();
       } else if (clickSfx) {
         clickSfx.currentTime = 0;
-        clickSfx.play().catch(() => {});
+        clickSfx.play().catch(e => console.log('Click play error:', e));
       }
       playHum();
-    }, 100);
+    });
   } else {
+    // Audio already initialized, play immediately
     if (useProgrammaticSound) {
       playProgrammaticClick();
     } else if (clickSfx) {
       clickSfx.currentTime = 0;
-      clickSfx.play().catch(() => {});
+      clickSfx.play().catch(e => console.log('Click play error:', e));
     }
     playHum();
   }
