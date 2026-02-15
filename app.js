@@ -8,6 +8,8 @@ let audioInitialized = false;
 let playCooldown = false;
 let stopTimeout = null;
 let humPlaying = false;
+let autoPlayInterval = null;
+let currentVideoEndTime = null;
 
 // Elements
 const player = document.getElementById('player');
@@ -168,34 +170,62 @@ function getEmbedUrl(videoUrl, startTime = 0) {
 
 function estimateVideoDuration(url) {
     const platform = getPlatformFromUrl(url);
-    if (platform === 'tiktok') return 30;
-    if (platform === 'direct') return 60;
-    return 120;
+    if (platform === 'tiktok') return 30; // TikTok shorts are short
+    if (platform === 'direct') return 60; // Direct videos default to 60s
+    return 180; // YouTube/Vimeo default to 3 minutes
 }
 
 function getPlaybackStrategy(duration) {
-    if (duration <= 45) {
+    // For videos longer than 70 seconds, play 60 seconds from a random starting point
+    // For shorter videos, play the whole thing
+    if (duration <= 70) {
         return { startTime: 0, playDuration: duration };
     }
-    const skipStart = 5;
-    const skipEnd = 10;
-    const maxStart = duration - skipEnd - 30;
-    const startTime = Math.floor(Math.random() * (maxStart - skipStart + 1)) + skipStart;
-    return { startTime, playDuration: 30 };
+    
+    // Start between 5 seconds in and (duration - 65) to ensure we have 60 seconds
+    const maxStart = Math.max(5, duration - 65);
+    const startTime = Math.floor(Math.random() * maxStart);
+    
+    return { startTime, playDuration: 60 }; // Always play for 60 seconds
+}
+
+function stopVideoAndPlayNext() {
+    // Clear any existing timeout
+    if (stopTimeout) {
+        clearTimeout(stopTimeout);
+        stopTimeout = null;
+    }
+    
+    // Stop current video
+    player.src = '';
+    
+    // Play static sound
+    if (staticSfx && audioInitialized) {
+        staticSfx.currentTime = 0;
+        staticSfx.play().catch(() => {});
+    }
+    
+    // Automatically play next video after a short delay (simulating channel change)
+    setTimeout(() => {
+        playRandom(false); // Pass false to not trigger sfx again
+    }, 500);
 }
 
 function stopVideoAfterDelay(duration) {
     if (stopTimeout) clearTimeout(stopTimeout);
+    
+    // Store when this video will end
+    currentVideoEndTime = Date.now() + (duration * 1000);
+    
+    // Set timeout to play next video
     stopTimeout = setTimeout(() => {
-        player.src = '';
-        if (staticSfx && audioInitialized) {
-            staticSfx.currentTime = 0;
-            staticSfx.play().catch(() => {});
-        }
+        stopVideoAndPlayNext();
     }, duration * 1000);
+    
+    console.log(`Video will play for ${duration} seconds, then auto-advance`);
 }
 
-function playRandom() {
+function playRandom(playSfx = true) {
     if (playCooldown || videos.length === 0) return;
 
     playCooldown = true;
@@ -205,10 +235,13 @@ function playRandom() {
         playBtn.classList.remove('disabled');
     }, 500);
     
-    sfx();
+    if (playSfx) {
+        sfx();
+    }
     
     const selected = videos[Math.floor(Math.random() * videos.length)];
 
+    // Play static sound when changing channels
     if (staticSfx && audioInitialized) {
         staticSfx.currentTime = 0;
         staticSfx.play().catch(() => {});
@@ -240,7 +273,12 @@ async function loadVideos() {
             };
         }).filter(v => v.url && isValidVideoUrl(v.url));
 
-        if (videos.length > 0) playRandom();
+        if (videos.length > 0) {
+            // Automatically start playing when videos are loaded
+            setTimeout(() => {
+                playRandom();
+            }, 1000); // Small delay to ensure everything is ready
+        }
     } catch (e) {
         console.log('Video load error:', e);
     }
@@ -289,14 +327,28 @@ function submitNostalgia() {
     checkSubmitButton();
     
     setTimeout(() => {
-        loadVideos();
+        loadVideos(); // Reload videos to include the new one
         showTV();
         submitMessage.innerHTML = '';
     }, 2000);
 }
 
+// === AUTO-PLAY MANAGEMENT ===
+function startAutoPlay() {
+    // If there's a video currently playing, let it finish
+    if (stopTimeout) {
+        console.log('Auto-play: Video already playing, will auto-advance');
+        return;
+    }
+    
+    // Otherwise start playing
+    if (videos.length > 0) {
+        playRandom();
+    }
+}
+
 // === EVENT BINDING ===
-playBtn.onclick = playRandom;
+playBtn.onclick = () => playRandom(true);
 document.getElementById('btnSubmit').onclick = showSubmit;
 document.getElementById('btnInfo').onclick = openInfo;
 document.getElementById('btnSend').onclick = submitNostalgia;
@@ -322,5 +374,14 @@ document.body.addEventListener('touchstart', function initOnFirstTouch() {
 // Initialize
 window.onload = () => {
     videoInfoDisplay.style.display = 'none';
-    loadVideos();
+    loadVideos(); // This will automatically start playing when videos are loaded
+    
+    // Check every minute if we need to restart auto-play (fallback)
+    setInterval(() => {
+        // If no video is playing (player src is empty) and we have videos, play one
+        if (!player.src && videos.length > 0) {
+            console.log('Auto-play: No video playing, starting one');
+            playRandom();
+        }
+    }, 30000); // Check every 30 seconds
 };
