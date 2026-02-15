@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Nostalgia TV</title>
+  <title>تلفاز الذكريات</title>
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 </head>
@@ -23,7 +23,7 @@
 <section id="tv" class="view active">
   <div class="tv-unit">
     <div class="tv-top">
-      <span class="model animated-title">NOSTALGIA-TV</span>
+      <span class="model animated-title">تلفاز الذكريات</span>
       <span class="now-playing" id="nowPlayingTitle"></span>
     </div>
     
@@ -49,13 +49,13 @@
       
       <!-- Button Row -->
       <div class="button-row">
-        <button id="btnInfo" class="action-btn about-btn">📻 ABOUT</button>
+        <button id="btnInfo" class="action-btn about-btn">؟ ما هذا</button>
         <button id="btnSwitch" class="play-btn">
           <span class="play-icon">▶</span>
-          <span class="play-text">PLAY</span>
+          <span class="play-text">تشغيل</span>
         </button>
-        <button id="btnShowName" class="action-btn info-btn">📋 INFO</button>
-        <button id="btnSubmit" class="action-btn submit-btn">📤 UPLOAD</button>
+        <button id="btnShowName" class="action-btn info-btn">!</button>
+        <button id="btnSubmit" class="action-btn submit-btn">＋ إضافة</button>
       </div>
     </div>
   </div>
@@ -63,31 +63,50 @@
 
 <section id="submit" class="view">
   <div class="retro-card">
-    <div class="terminal-header">📤 SHARE A VIDEO</div>
-    <p class="instruction-text">PASTE ANY VIDEO LINK (YouTube, Vimeo, TikTok, Dailymotion)</p>
+    <div class="terminal-header">📤 أضف ذكرى</div>
+    <p class="instruction-text">
+      أضف رابط مقطع يذكّرك بطفولتك  
+      (يوتيوب أو أي موقع يدعم التشغيل)
+    </p>
     <div class="field">
-        <label>VIDEO LINK *</label>
+        <label>رابط الفيديو *</label>
         <input id="s_link" type="text" placeholder="https://...">
     </div>
     <div class="field">
-        <label>YOUR NAME (optional)</label>
-        <input id="s_name" type="text" placeholder="Nameless">
+        <label>اسمك (اختياري)</label>
+        <input id="s_name" type="text" placeholder="بدون اسم">
     </div>
-    <button id="btnSend" class="glitch-btn" disabled>📡 SEND TO TV</button>
+    <button id="btnSend" class="glitch-btn" disabled>📡 إرسال إلى آلة الزمن</button>
     <div id="submitMessage" class="submit-message"></div>
-    <button class="back-link" onclick="showTV()">← BACK TO TV</button>
+    <button class="back-link" onclick="showTV()">← العودة إلى التلفاز</button>
   </div>
 </section>
 
 <div id="info" class="overlay">
   <div class="retro-card">
-    <div class="terminal-header">📺 NOSTALGIA TV</div>
-    <p style="color: #ff99cc; font-size: 1.3rem;">✨ COMMUNITY VIBES ✨</p>
-    <p style="color: #66ccff;">▶ CLICK PLAY FOR RANDOM VIDEO</p>
-    <p style="color: #99ff99;">📤 SHARE YOUR FAVORITES</p>
-    <p style="color: #ffd966;">📋 INFO TOGGLES VIDEO DETAILS</p>
-    <p style="color: #ffaa00;">⚡ CLICK ANYWHERE TO ENABLE SOUND</p>
-    <button class="glitch-btn" onclick="closeInfo()">CLOSE</button>
+    <div class="terminal-header">📺 تلفاز الذكريات</div>
+
+    <p style="color:#ff99cc; font-size:1.3rem;">
+      آلة زمن جماعية لذكريات الكرتون والأنمي
+    </p>
+
+    <p style="color:#66ccff;">
+      ▶ اضغط تشغيل لمقطع عشوائي من الماضي
+    </p>
+
+    <p style="color:#99ff99;">
+      ＋ أضف ذكرياتك وساهم في بناء الأرشيف
+    </p>
+
+    <p style="color:#ffd966;">
+      ! لإظهار أو إخفاء اسم المقطع
+    </p>
+
+    <p style="color:#ffaa00;">
+      ⚡ اضغط في أي مكان لتفعيل الصوت
+    </p>
+
+    <button class="glitch-btn" onclick="closeInfo()">إغلاق</button>
   </div>
 </div>
 
